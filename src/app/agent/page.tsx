@@ -2,11 +2,85 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { getDb, getStorageInstance } from "@/lib/firebase";
+import { getDb } from "@/lib/firebase";
 import Link from "next/link";
 
 type AgentStatus = "approved" | "double-agent" | "imposter";
+
+async function optimizeImageToPassport(file: File): Promise<string> {
+  const MAX_WIDTH = 480; // roughly passport ratio 3:4
+  const MAX_HEIGHT = 640;
+  const QUALITY = 0.7;
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const targetRatio = MAX_WIDTH / MAX_HEIGHT;
+        const srcRatio = img.width / img.height;
+
+        let sx = 0;
+        let sy = 0;
+        let sWidth = img.width;
+        let sHeight = img.height;
+
+        if (srcRatio > targetRatio) {
+          // Source is wider than target: crop left/right
+          sHeight = img.height;
+          sWidth = img.height * targetRatio;
+          sx = (img.width - sWidth) / 2;
+          sy = 0;
+        } else {
+          // Source is taller than target: crop top/bottom
+          sWidth = img.width;
+          sHeight = img.width / targetRatio;
+          sx = 0;
+          sy = (img.height - sHeight) / 2;
+        }
+
+        canvas.width = MAX_WIDTH;
+        canvas.height = MAX_HEIGHT;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Canvas not supported"));
+          return;
+        }
+
+        ctx.drawImage(
+          img,
+          sx,
+          sy,
+          sWidth,
+          sHeight,
+          0,
+          0,
+          MAX_WIDTH,
+          MAX_HEIGHT
+        );
+
+        const dataUrl = canvas.toDataURL("image/jpeg", QUALITY);
+        resolve(dataUrl);
+      };
+      img.onerror = () => reject(new Error("Image load error"));
+      img.src = reader.result as string;
+    };
+    reader.onerror = () => reject(new Error("File read error"));
+    reader.readAsDataURL(file);
+  });
+}
+
+function generateStory(codename: string, status: AgentStatus): string {
+  const base =
+    status === "approved"
+      ? "cleared every background check and still sings on pitch under pressure."
+      : status === "double-agent"
+      ? "has been spotted cheering for both rival sections and somehow gets away with it."
+      : "managed to sneak past three checkpoints before admitting they just wanted snacks.";
+
+  return `Agent ${codename} ${base}`;
+}
 
 function generateCodename() {
   const adjectives = [
@@ -106,15 +180,6 @@ export default function AgentPage() {
       event.preventDefault();
       if (!file) return;
 
-      const db = getDb();
-      const storage = getStorageInstance();
-      if (!db || !storage) {
-        setError(
-          "Firebase is not configured. Add NEXT_PUBLIC_FIREBASE_* env vars in Vercel (or .env.local) and redeploy."
-        );
-        return;
-      }
-
       try {
         setLoading(true);
         setError(null);
@@ -122,26 +187,31 @@ export default function AgentPage() {
         const newCodename = generateCodename();
         const newStatus = generateStatus();
 
-        const storageRef = ref(
-          storage,
-          `agents/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`
-        );
-        const snap = await uploadBytes(storageRef, file);
-        const downloadUrl = await getDownloadURL(snap.ref);
+        const db = getDb();
+        if (!db) {
+          throw new Error("Firestore is not configured");
+        }
+
+        const optimizedPhoto = await optimizeImageToPassport(file);
+        const story = generateStory(newCodename, newStatus);
 
         await addDoc(collection(db, "agents"), {
           codename: newCodename,
           status: newStatus,
-          imageUrl: downloadUrl,
+          photoDataUrl: optimizedPhoto,
+          story,
           createdAt: serverTimestamp(),
         });
+
+        // Simulate a short "scanning" delay for effect
+        await new Promise((resolve) => setTimeout(resolve, 1200));
 
         setCodename(newCodename);
         setStatus(newStatus);
       } catch (err) {
         console.error(err);
         setError(
-          "Secure channel error. Check that Firebase is configured and try again."
+          "Secure channel error. Check that Firebase Firestore is configured and try again."
         );
       } finally {
         setLoading(false);
@@ -216,6 +286,7 @@ export default function AgentPage() {
                 id="photo"
                 type="file"
                 accept="image/*"
+                capture="environment"
                 className="hidden"
                 onChange={handleFileChange}
               />
@@ -231,7 +302,7 @@ export default function AgentPage() {
 
             {error && (
               <p className="text-xs text-rose-300">
-                {error} Make sure your Firebase env vars are set.
+                {error}
               </p>
             )}
           </form>
