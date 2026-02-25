@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "In The Buff — Operation Classified",
   description:
-    "Spy-themed live program for In The Buff’s concert audience — set order, missions, and intel on one secure briefing screen.",
+    "Spy-themed live program for In The Buff's concert audience — set order, missions, and intel on one secure briefing screen.",
 };
 
 export default function RootLayout({

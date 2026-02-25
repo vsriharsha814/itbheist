@@ -46,4 +46,3 @@ export function getStorageInstance(): FirebaseStorage | null {
   const a = getFirebaseApp();
   return a ? getStorage(a) : null;
 }
-

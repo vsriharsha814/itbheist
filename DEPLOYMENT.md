@@ -7,16 +7,14 @@ Make sure your repo is pushed to GitHub, GitLab, or Bitbucket.
 ## 2. Import the project on Vercel
 
 1. Go to [vercel.com](https://vercel.com) and sign in.
-2. Click **Add New** → **Project** and import your `ITBHeist` repo.
-3. **Important:** Set **Root Directory** to `web`.
-   - After importing, open the project → **Settings** → **General**.
-   - Under **Root Directory**, click **Edit**, enter `web`, and save.
+2. Click **Add New** → **Project** and import your `itbheist` repo.
+3. Leave **Root Directory** as the repo root (blank). The Next.js app lives at the root.
 4. Leave **Framework Preset** as Next.js (auto-detected). Build and Output settings can stay default.
 
 ## 3. Add environment variables
 
 1. In the project, go to **Settings** → **Environment Variables**.
-2. Add each variable from `web/.env.example` for **Production** (and optionally Preview/Development):
+2. Add each variable from `.env.example` for **Production** (and optionally Preview/Development):
 
    - `NEXT_PUBLIC_FIREBASE_API_KEY`
    - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
@@ -33,13 +31,12 @@ Without these, the site still builds and deploys; the main briefing page works, 
 1. Go to the **Deployments** tab and click **Redeploy** on the latest deployment (or push a new commit to trigger a deploy).
 2. After the build finishes, open the generated URL to test the site.
 
-## Optional: Deploy from the repo root
+## Optional: Deploy from the CLI
 
-If you prefer to run Vercel CLI from the repo root:
+From the repo root:
 
 ```bash
-cd /path/to/ITBHeist
+cd /path/to/itbheist
+npm install
 npx vercel
 ```
-
-When prompted, set the root directory to `web`, or link the project in the Vercel dashboard with Root Directory set to `web` as above.
