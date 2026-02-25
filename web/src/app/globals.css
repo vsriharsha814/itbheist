@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --background: #020617;
+  --foreground: #e5f9ff;
+  --accent: #22c55e;
+  --accent-soft: rgba(34, 197, 94, 0.15);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617;
+    --foreground: #e5f9ff;
+  }
+}
+
+body {
+  background: radial-gradient(circle at top, #0f172a 0, #020617 55%, #000 100%);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont,
+    "SF Pro Text", sans-serif;
+  text-rendering: geometricPrecision;
+}
+
+.scanlines::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    rgba(15, 23, 42, 0.6) 1px,
+    transparent 2px
+  );
+  background-size: 100% 3px;
+  opacity: 0.25;
+  mix-blend-mode: soft-light;
+}
+
+.pulse-dot {
+  animation: pulse-glow 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+}
+
+.hud-card {
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.25);
+}
