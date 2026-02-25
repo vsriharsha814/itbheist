@@ -22,42 +22,42 @@ const SETLIST: SetItem[] = [
     id: 1,
     codeName: "Cold Open",
     title: "First contact with the audience",
-    approxTime: "≈ 7:30 PM",
+    approxTime: "≈ 6:00 PM",
     note: "Stay sharp — this is your first impression op.",
   },
   {
     id: 2,
     codeName: "Operation Throwback",
     title: "Classic In The Buff charts",
-    approxTime: "≈ 7:40 PM",
+    approxTime: "≈ 6:10 PM",
     note: "Identify any alumni agents singing along.",
   },
   {
     id: 3,
     codeName: "Deep Cover Solos",
     title: "Feature solos from undercover agents",
-    approxTime: "≈ 7:55 PM",
+    approxTime: "≈ 6:25 PM",
     note: "Your mission: do not blow their cover by screaming their real names.",
   },
   {
     id: 4,
     codeName: "Intermission Debrief",
     title: "Short break for snacks and intel gathering",
-    approxTime: "≈ 8:10 PM",
+    approxTime: "≈ 6:40 PM",
     note: "Hydrate. Stretch. Strategize your favorite moment so far.",
   },
   {
     id: 5,
     codeName: "Phase Two",
     title: "New arrangements and secret weapons",
-    approxTime: "≈ 8:25 PM",
+    approxTime: "≈ 6:55 PM",
     note: "Listen for code phrases hidden in the lyrics.",
   },
   {
     id: 6,
     codeName: "Final Transmission",
     title: "Encore & classified goodbyes",
-    approxTime: "≈ 8:50 PM",
+    approxTime: "≈ 7:20 PM",
     note: "Mission complete. Extract safely, humming the last chord.",
   },
 ];
@@ -144,7 +144,7 @@ export default function Home() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
                 Location
               </p>
-              <p>CU Boulder • Concert Hall</p>
+              <p>CU Boulder • MATH 100</p>
             </div>
             <div className="text-right">
               <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
@@ -296,7 +296,7 @@ export default function Home() {
           </div>
           <p className="mt-2">
             If a moment tonight makes you laugh, cry, or forget you&apos;re in
-            a concert hall, mentally bookmark it. That&apos;s classified intel
+            MATH 100, mentally bookmark it. That&apos;s classified intel
             you can debrief about with your fellow agents after the show.
           </p>
         </section>
