@@ -367,7 +367,7 @@ export default function ScreenPage() {
               </div>
             ) : (
               <>
-                {/* Small FUI cards */}
+                {/* Small FUI cards — compact version of AgentCard */}
                 {latestAgents.map((agent, i) => {
                   if (i === effectiveFocusedIndex) return null;
                   const unfocusedRank = i < effectiveFocusedIndex ? i : i - 1;
@@ -376,6 +376,25 @@ export default function ScreenPage() {
                   const isHovered = hoveredCardId === agent.id;
                   const isDimmed =
                     hoveredCardId != null && hoveredCardId !== agent.id;
+                  const isImposter = agent.status === "imposter";
+                  const statusDisplay =
+                    agent.status === "approved"
+                      ? "APPROVED"
+                      : agent.status === "imposter"
+                        ? "IMPOSTER"
+                        : "PENDING";
+                  const statusColor =
+                    agent.status === "double-agent"
+                      ? "text-amber-400 border-amber-500/50"
+                      : isImposter
+                        ? "text-red-500 border-red-500/50"
+                        : "text-cyan-400 border-cyan-500/50";
+                  const hexGlow =
+                    agent.status === "double-agent"
+                      ? "shadow-[0_0_10px_rgba(251,191,36,0.4)]"
+                      : isImposter
+                        ? "shadow-[0_0_10px_rgba(239,68,68,0.4)]"
+                        : "shadow-[0_0_10px_rgba(34,211,238,0.4)]";
 
                   return (
                     <div
@@ -390,79 +409,88 @@ export default function ScreenPage() {
                       }}
                     >
                       <div
-                        className={`fui-chamfer-asymmetric fui-bloom border bg-slate-900/80 backdrop-blur-md ${
-                          agent.status === "imposter"
-                            ? "border-rose-500/50 fui-imposter-flicker"
-                            : "border-cyan-500/40 screen-glow"
+                        className={`fui-bloom border bg-slate-950/90 backdrop-blur-md ${
+                          isImposter
+                            ? "border-red-500/60 fui-imposter-flicker"
+                            : "border-cyan-500/40"
                         } ${isDimmed ? "opacity-50 blur-[1px]" : ""}`}
                         style={{
                           transform: `perspective(420px) rotateX(${2 - (slotIdx % 5) * 0.6}deg) rotateY(${(slotIdx % 3) * 0.9}deg)${isHovered ? " scale(1.05)" : ""}`,
                           transition: "transform 0.2s ease",
                           fontFamily: "var(--font-fui-mono)",
+                          clipPath:
+                            "polygon(0% 12px, 12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%)",
                         }}
                         onMouseEnter={() => setHoveredCardId(agent.id)}
                         onMouseLeave={() => setHoveredCardId(null)}
                       >
-                      {/* Tab: Agent ID */}
-                      <div className="border-b border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-[9px] uppercase tracking-widest text-cyan-200/90">
-                        ID.{agent.id.slice(-6)}
-                      </div>
-                      <div className="p-2">
-                        {/* Hex photo + scan ring */}
-                        <div className="relative mx-auto h-14 w-14">
-                          <div
-                            className={`fui-scan-ring absolute inset-0 rounded-full border-2 border-dashed border-cyan-500/50 ${
-                              agent.status === "approved"
-                                ? "border-emerald-400/50"
-                                : agent.status === "imposter"
-                                ? "border-rose-400/50"
-                                : "border-amber-400/50"
-                            }`}
-                          />
-                          <div className="absolute inset-1 overflow-hidden rounded-full bg-slate-800 fui-hex-mask">
-                            {agent.photoDataUrl ? (
-                              <img
-                                src={agent.photoDataUrl}
-                                alt=""
-                                className="h-full w-full object-cover"
+                        {/* Tab: Agent ID + small indicator diamonds */}
+                        <div className="flex items-center justify-between border-b border-cyan-900/40 bg-cyan-500/10 px-2 py-1">
+                          <span className="font-mono text-[8px] tracking-[0.2em] text-cyan-300/80 uppercase">
+                            ID:{agent.id.slice(-6)}
+                          </span>
+                          <div className="flex gap-0.5">
+                            {[1, 2].map((j) => (
+                              <div
+                                key={j}
+                                className="h-1 w-1 rotate-45 bg-cyan-500/60"
                               />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-[10px] text-slate-500">
-                                —
-                              </div>
-                            )}
+                            ))}
                           </div>
                         </div>
-                        <p className="mt-1 truncate text-center text-[10px] font-semibold tracking-wide text-cyan-100">
-                          {agent.codename}
-                        </p>
-                        {/* Status: pulse dot (approved) or static (others) */}
-                        <div className="mt-1 flex items-center justify-center gap-1">
-                          {agent.status === "approved" ? (
-                            <span className="relative fui-pulse-ring h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                          ) : agent.status === "imposter" ? (
-                            <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
-                          ) : (
-                            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                          )}
-                          <span className="text-[8px] uppercase text-slate-400">
-                            {statusLabel(agent.status)}
-                          </span>
+                        <div className="flex items-start gap-2 px-2 py-2">
+                          {/* Hex photo + scan ring */}
+                          <div className="relative shrink-0">
+                            <div
+                              className={`h-10 w-10 bg-cyan-500/20 p-[2px] ${hexGlow}`}
+                              style={{
+                                clipPath:
+                                  "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                              }}
+                            >
+                              {agent.photoDataUrl ? (
+                                <img
+                                  src={agent.photoDataUrl}
+                                  alt={agent.codename}
+                                  className="h-full w-full object-cover"
+                                  style={{
+                                    clipPath:
+                                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                                  }}
+                                />
+                              ) : (
+                                <div
+                                  className="flex h-full w-full items-center justify-center text-[9px] text-slate-500"
+                                  style={{
+                                    clipPath:
+                                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                                  }}
+                                >
+                                  —
+                                </div>
+                              )}
+                            </div>
+                            <div
+                              className="fui-scan-ring pointer-events-none absolute -inset-1 rounded-full border border-dashed border-cyan-500/30"
+                              style={{ animationDuration: "10s" }}
+                            />
+                          </div>
+
+                          {/* Codename + status */}
+                          <div className="min-w-0 flex-1">
+                            <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-slate-400">
+                              Codename
+                            </p>
+                            <p className="truncate text-[11px] font-semibold uppercase tracking-tight text-cyan-50">
+                              {agent.codename}
+                            </p>
+                            <div
+                              className={`mt-1 inline-block rounded-sm border px-2 py-0.5 text-[8px] font-bold ${statusColor}`}
+                            >
+                              {statusDisplay}
+                            </div>
+                          </div>
                         </div>
-                        {/* Micro sparkline */}
-                        <svg
-                          className="mx-auto mt-1 h-4 w-14"
-                          viewBox="0 0 60 16"
-                          preserveAspectRatio="none"
-                        >
-                          <polyline
-                            fill="none"
-                            stroke="rgba(6,182,212,0.5)"
-                            strokeWidth="0.8"
-                            points={sparkPath(agent.id)}
-                          />
-                        </svg>
-                      </div>
                       </div>
                     </div>
                   );
