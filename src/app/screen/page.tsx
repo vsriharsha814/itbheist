@@ -137,10 +137,13 @@ export default function ScreenPage() {
     return () => unsubscribe();
   }, []);
 
+  // Cycle focus within displayed set only (latestAgents is capped at 20)
   useEffect(() => {
-    if (agents.length <= 1) return;
+    const n = Math.min(agents.length, 20);
+    if (n <= 1) return;
+    setFocusedIndex((i) => (i >= n ? 0 : i));
     const id = setInterval(() => {
-      setFocusedIndex((i) => (i + 1) % agents.length);
+      setFocusedIndex((i) => (i + 1) % n);
     }, FOCUS_DURATION_MS);
     return () => clearInterval(id);
   }, [agents.length]);
@@ -316,8 +319,8 @@ export default function ScreenPage() {
                 </linearGradient>
               </defs>
               {latestAgents.map((_, i) => {
-                const idx = i === focusedIndex ? latestAgents.length : i;
-                const slotIdx = idx > focusedIndex ? idx - 1 : idx;
+                if (i === focusedIndex) return null;
+                const slotIdx = i < focusedIndex ? i : i - 1;
                 const slot = SCATTER_SLOTS[slotIdx % SCATTER_SLOTS.length];
                 const cx = 50;
                 const cy = 45;
