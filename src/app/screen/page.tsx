@@ -271,7 +271,7 @@ export default function ScreenPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                 {agents.map((agent) => {
                   const isImposter = agent.status === "imposter";
                   const statusDisplay =
@@ -304,7 +304,7 @@ export default function ScreenPage() {
                       }`}
                       style={{
                         clipPath:
-                          "polygon(0% 15px, 15px 0%, 100% 0%, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0% 100%)",
+                          "polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%)",
                       }}
                     >
                       <div
@@ -312,26 +312,26 @@ export default function ScreenPage() {
                         style={{
                           fontFamily: "var(--font-fui-mono)",
                           clipPath:
-                            "polygon(0% 14px, 14px 0%, 100% 0%, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0% 100%)",
+                            "polygon(0% 9px, 9px 0%, 100% 0%, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0% 100%)",
                         }}
                       >
-                      <div className="flex justify-between items-center border-b border-cyan-900/50 pb-2 pt-1.5 px-3">
-                        <span className="font-mono text-[10px] tracking-[0.2em] text-cyan-500/70 uppercase">
-                          AGENT_REF_ID: {agent.id.slice(-8)}
+                      <div className="flex justify-between items-center border-b border-cyan-900/50 py-1 px-2">
+                        <span className="font-mono text-[8px] tracking-[0.15em] text-cyan-500/70 uppercase">
+                          AGENT_REF_ID: {agent.id.slice(-6)}
                         </span>
-                        <div className="flex gap-1">
+                        <div className="flex gap-0.5">
                           {[1, 2, 3].map((j) => (
                             <div
                               key={j}
-                              className="h-1 w-1 rotate-45 bg-cyan-500/50"
+                              className="h-0.5 w-0.5 rotate-45 bg-cyan-500/50"
                             />
                           ))}
                         </div>
                       </div>
-                      <div className="flex gap-3 p-3">
+                      <div className="flex gap-2 p-2">
                         <div className="relative shrink-0">
                           <div
-                            className={`h-16 w-16 bg-cyan-500/20 p-[2px] ${hexGlow}`}
+                            className={`h-11 w-11 bg-cyan-500/20 p-[1px] ${hexGlow}`}
                             style={{
                               clipPath:
                                 "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
@@ -349,7 +349,7 @@ export default function ScreenPage() {
                               />
                             ) : (
                               <div
-                                className="flex h-full w-full items-center justify-center text-[10px] text-slate-500"
+                                className="flex h-full w-full items-center justify-center text-[8px] text-slate-500"
                                 style={{
                                   clipPath:
                                     "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
@@ -360,53 +360,53 @@ export default function ScreenPage() {
                             )}
                           </div>
                           <div
-                            className="fui-scan-ring pointer-events-none absolute -inset-1 rounded-full border border-dashed border-cyan-500/30"
+                            className="fui-scan-ring pointer-events-none absolute -inset-0.5 rounded-full border border-dashed border-cyan-500/30"
                             style={{ animationDuration: "10s" }}
                           />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-mono text-[10px] text-slate-400 uppercase tracking-widest">
+                          <p className="font-mono text-[8px] text-slate-400 uppercase tracking-wider">
                             Codename
                           </p>
-                          <p className="text-sm font-bold uppercase tracking-tighter text-cyan-50 leading-tight md:text-base">
+                          <p className="text-xs font-bold uppercase tracking-tighter text-cyan-50 leading-tight truncate">
                             {agent.codename}
                           </p>
-                          <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.15em] text-cyan-500/80">
+                          <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.1em] text-cyan-500/80">
                             Achievement
                           </p>
-                          <p className="text-xs font-medium text-cyan-200/90">
+                          <p className="text-[10px] font-medium text-cyan-200/90 line-clamp-1">
                             {agent.achievementTitle ?? "—"}
                           </p>
                           <div
-                            className={`mt-2 inline-block rounded-sm border px-3 py-1 text-[10px] font-bold bg-black/20 ${statusColor}`}
+                            className={`mt-1 inline-block rounded-sm border px-2 py-0.5 text-[8px] font-bold bg-black/20 ${statusColor}`}
                           >
                             {statusDisplay} AGENT
                           </div>
                         </div>
                       </div>
-                      <div className="relative border-t border-cyan-900/50 pt-3 px-3 pb-2">
+                      <div className="relative border-t border-cyan-900/50 py-1.5 px-2">
                         {agent.story ? (
-                          <p className="font-mono text-[11px] leading-relaxed text-slate-300">
-                            <span className="text-cyan-500 mr-1.5 opacity-50">
+                          <p className="font-mono text-[9px] leading-snug text-slate-300 line-clamp-2">
+                            <span className="text-cyan-500 mr-1 opacity-50">
                               &gt;&gt;
                             </span>
                             {agent.story}
                           </p>
                         ) : (
-                          <p className="font-mono text-[11px] text-slate-500">
-                            <span className="text-cyan-500 mr-1.5 opacity-50">
+                          <p className="font-mono text-[9px] text-slate-500">
+                            <span className="text-cyan-500 mr-1 opacity-50">
                               &gt;&gt;
                             </span>
                             —
                           </p>
                         )}
-                        <div className="absolute bottom-0 right-0 w-8 h-8 opacity-20 border-r border-b border-cyan-400" />
+                        <div className="absolute bottom-0 right-0 w-5 h-5 opacity-20 border-r border-b border-cyan-400" />
                       </div>
-                      <div className="flex justify-between items-center px-3 py-1.5 opacity-30 font-mono text-[8px] text-cyan-500 uppercase border-t border-cyan-900/30">
+                      <div className="flex justify-between items-center px-2 py-1 opacity-30 font-mono text-[7px] text-cyan-500 uppercase border-t border-cyan-900/30">
                         <span>SRC: DB.ALPHA_V.2.0</span>
-                        <span className="flex items-center gap-2">
-                          <div className="w-8 h-[1px] bg-cyan-500" />
-                          GRID_REF_029
+                        <span className="flex items-center gap-1">
+                          <div className="w-5 h-[1px] bg-cyan-500" />
+                          GRID_REF
                         </span>
                       </div>
                       </div>

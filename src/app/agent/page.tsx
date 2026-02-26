@@ -343,8 +343,7 @@ export default function AgentPage() {
                   Status: {statusLabel(status)}
                 </p>
                 <p className="mt-1 text-[11px] text-slate-300 md:text-xs">
-                  Memorize your codename. Use it loudly when cheering for your
-                  favorite moments tonight.
+                  Memorize your codename. This will be your identifier when you join the agency.
                 </p>
               </div>
             </div>
