@@ -141,7 +141,6 @@ export default function ScreenPage() {
   useEffect(() => {
     const n = Math.min(agents.length, 20);
     if (n <= 1) return;
-    setFocusedIndex((i) => (i >= n ? 0 : i));
     const id = setInterval(() => {
       setFocusedIndex((i) => (i + 1) % n);
     }, FOCUS_DURATION_MS);
@@ -191,6 +190,11 @@ export default function ScreenPage() {
   }, []);
 
   const latestAgents = useMemo(() => agents.slice(0, 20), [agents]);
+
+  const effectiveFocusedIndex =
+    latestAgents.length > 0
+      ? Math.min(focusedIndex, latestAgents.length - 1)
+      : 0;
 
   const transformStyle = useMemo(
     () => ({
@@ -319,8 +323,8 @@ export default function ScreenPage() {
                 </linearGradient>
               </defs>
               {latestAgents.map((_, i) => {
-                if (i === focusedIndex) return null;
-                const slotIdx = i < focusedIndex ? i : i - 1;
+                if (i === effectiveFocusedIndex) return null;
+                const slotIdx = i < effectiveFocusedIndex ? i : i - 1;
                 const slot = SCATTER_SLOTS[slotIdx % SCATTER_SLOTS.length];
                 const cx = 50;
                 const cy = 45;
@@ -371,8 +375,8 @@ export default function ScreenPage() {
               <>
                 {/* Small FUI cards */}
                 {latestAgents.map((agent, i) => {
-                  if (i === focusedIndex) return null;
-                  const unfocusedRank = i < focusedIndex ? i : i - 1;
+                  if (i === effectiveFocusedIndex) return null;
+                  const unfocusedRank = i < effectiveFocusedIndex ? i : i - 1;
                   const slotIdx = unfocusedRank % SCATTER_SLOTS.length;
                   const slot = SCATTER_SLOTS[slotIdx];
                   const isHovered = hoveredCardId === agent.id;
@@ -471,10 +475,10 @@ export default function ScreenPage() {
                 })}
 
                 {/* Focused FUI card (center) — styled like reference Whisper-26 card */}
-                {latestAgents[focusedIndex] && (
+                {latestAgents[effectiveFocusedIndex] && (
                   <div
                     className={`absolute left-1/2 top-1/2 z-20 w-[min(92vw,24rem)] -translate-x-1/2 -translate-y-1/2 fui-chamfer-asymmetric border-2 bg-slate-950/90 p-4 backdrop-blur-xl md:p-5 ${
-                      latestAgents[focusedIndex].status === "imposter"
+                      latestAgents[effectiveFocusedIndex].status === "imposter"
                         ? "border-rose-500/70 fui-imposter-flicker"
                         : "border-cyan-400/60 screen-glow-breathe"
                     }`}
@@ -487,7 +491,7 @@ export default function ScreenPage() {
                   >
                     {/* Tab */}
                     <div className="mb-3 inline-flex max-w-full border border-cyan-500/40 bg-slate-950/90 px-4 py-1.5 text-[9px] uppercase tracking-[0.24em] text-cyan-200">
-                      AGENT_{latestAgents[focusedIndex].codename.replace(/\s/g, "_")}
+                      AGENT_{latestAgents[effectiveFocusedIndex].codename.replace(/\s/g, "_")}
                     </div>
 
                     <div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
@@ -495,21 +499,21 @@ export default function ScreenPage() {
                       <div className="relative h-28 w-28 shrink-0 md:h-32 md:w-32">
                         <div
                           className={`fui-scan-ring absolute -inset-2 rounded-full border-2 border-dashed ${
-                            latestAgents[focusedIndex].status === "approved"
+                            latestAgents[effectiveFocusedIndex].status === "approved"
                               ? "border-emerald-400/70"
-                              : latestAgents[focusedIndex].status === "imposter"
+                              : latestAgents[effectiveFocusedIndex].status === "imposter"
                               ? "border-rose-400/70"
                               : "border-amber-400/70"
                           }`}
                         />
                         <div
                           className={`fui-hex-mask absolute inset-0 overflow-hidden bg-slate-800 ${statusGlow(
-                            latestAgents[focusedIndex].status
+                            latestAgents[effectiveFocusedIndex].status
                           )}`}
                         >
-                          {latestAgents[focusedIndex].photoDataUrl ? (
+                          {latestAgents[effectiveFocusedIndex].photoDataUrl ? (
                             <img
-                              src={latestAgents[focusedIndex].photoDataUrl}
+                              src={latestAgents[effectiveFocusedIndex].photoDataUrl}
                               alt=""
                               className="h-full w-full object-cover"
                             />
@@ -530,29 +534,29 @@ export default function ScreenPage() {
                           className="mt-1 text-2xl font-semibold tracking-wide text-cyan-50 md:text-3xl"
                           style={{ fontFamily: "var(--font-geist-sans)" }}
                         >
-                          {latestAgents[focusedIndex].codename}
+                          {latestAgents[effectiveFocusedIndex].codename}
                         </p>
 
                         <div className="mt-3 flex items-center justify-center gap-2 md:justify-start">
                           <span
                             className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide ${
-                              latestAgents[focusedIndex].status === "approved"
+                              latestAgents[effectiveFocusedIndex].status === "approved"
                                 ? "bg-emerald-500 text-emerald-950 shadow-[0_0_22px_rgba(16,185,129,0.8)]"
-                                : latestAgents[focusedIndex].status === "double-agent"
+                                : latestAgents[effectiveFocusedIndex].status === "double-agent"
                                 ? "bg-amber-400 text-amber-950 shadow-[0_0_22px_rgba(251,191,36,0.8)]"
                                 : "bg-rose-500 text-rose-950 shadow-[0_0_22px_rgba(244,63,94,0.8)]"
                             }`}
                           >
-                            {statusLabel(latestAgents[focusedIndex].status)}
+                            {statusLabel(latestAgents[effectiveFocusedIndex].status)}
                           </span>
                         </div>
 
                         {/* Divider line */}
                         <div className="mt-4 h-px w-full bg-slate-700/80" />
 
-                        {latestAgents[focusedIndex].story && (
+                        {latestAgents[effectiveFocusedIndex].story && (
                           <p className="mt-3 text-xs leading-relaxed text-slate-200 md:text-sm">
-                            {latestAgents[focusedIndex].story}
+                            {latestAgents[effectiveFocusedIndex].story}
                           </p>
                         )}
 
