@@ -33,17 +33,6 @@ function statusLabel(status: AgentStatus) {
   }
 }
 
-function statusGlow(status: AgentStatus) {
-  switch (status) {
-    case "approved":
-      return "shadow-[0_0_20px_rgba(34,197,94,0.4)]";
-    case "double-agent":
-      return "shadow-[0_0_20px_rgba(234,179,8,0.4)]";
-    case "imposter":
-      return "shadow-[0_0_20px_rgba(244,63,94,0.4)]";
-  }
-}
-
 function mapDoc(doc: DocumentData): AgentDoc {
   const data = doc.data() || {};
   return {
@@ -72,24 +61,26 @@ function sparkPath(id: string): string {
   return points.join(" ");
 }
 
+// 16 non-overlapping slots: min ~18% apart so cards (8.5rem) never touch. Max 16 scattered = 1 focused + 16 scattered.
 const SCATTER_SLOTS = [
-  { left: 6, top: 10 },
-  { left: 22, top: 6 },
-  { left: 38, top: 8 },
-  { left: 54, top: 6 },
-  { left: 70, top: 12 },
-  { left: 86, top: 22 },
-  { left: 90, top: 42 },
-  { left: 84, top: 62 },
-  { left: 72, top: 78 },
-  { left: 52, top: 84 },
-  { left: 32, top: 80 },
-  { left: 16, top: 64 },
-  { left: 8, top: 44 },
-  { left: 12, top: 24 },
-  { left: 28, top: 42 },
-  { left: 62, top: 40 },
+  { left: 18, top: 20 },
+  { left: 38, top: 18 },
+  { left: 58, top: 20 },
+  { left: 78, top: 22 },
+  { left: 85, top: 38 },
+  { left: 82, top: 56 },
+  { left: 72, top: 72 },
+  { left: 52, top: 80 },
+  { left: 32, top: 78 },
+  { left: 18, top: 68 },
+  { left: 12, top: 52 },
+  { left: 14, top: 36 },
+  { left: 28, top: 48 },
+  { left: 50, top: 48 },
+  { left: 68, top: 50 },
+  { left: 50, top: 64 },
 ];
+const MAX_SCATTERED = SCATTER_SLOTS.length;
 
 const FOCUS_DURATION_MS = 8000;
 const PARALLAX_SENSITIVITY = 0.012;
@@ -137,9 +128,9 @@ export default function ScreenPage() {
     return () => unsubscribe();
   }, []);
 
-  // Cycle focus within displayed set only (latestAgents is capped at 20)
+  // Cycle focus within displayed set only (capped so scattered count ≤ slots = no overlap)
   useEffect(() => {
-    const n = Math.min(agents.length, 20);
+    const n = Math.min(agents.length, MAX_SCATTERED + 1);
     if (n <= 1) return;
     const id = setInterval(() => {
       setFocusedIndex((i) => (i + 1) % n);
@@ -189,7 +180,10 @@ export default function ScreenPage() {
     return () => clearInterval(id);
   }, []);
 
-  const latestAgents = useMemo(() => agents.slice(0, 20), [agents]);
+  const latestAgents = useMemo(
+    () => agents.slice(0, MAX_SCATTERED + 1),
+    [agents]
+  );
 
   const effectiveFocusedIndex =
     latestAgents.length > 0
@@ -377,7 +371,7 @@ export default function ScreenPage() {
                 {latestAgents.map((agent, i) => {
                   if (i === effectiveFocusedIndex) return null;
                   const unfocusedRank = i < effectiveFocusedIndex ? i : i - 1;
-                  const slotIdx = unfocusedRank % SCATTER_SLOTS.length;
+                  const slotIdx = unfocusedRank;
                   const slot = SCATTER_SLOTS[slotIdx];
                   const isHovered = hoveredCardId === agent.id;
                   const isDimmed =
@@ -474,111 +468,140 @@ export default function ScreenPage() {
                   );
                 })}
 
-                {/* Focused FUI card (center) — styled like reference Whisper-26 card */}
-                {latestAgents[effectiveFocusedIndex] && (
-                  <div
-                    className={`absolute left-1/2 top-1/2 z-20 w-[min(92vw,24rem)] -translate-x-1/2 -translate-y-1/2 fui-chamfer-asymmetric border-2 bg-slate-950/90 p-4 backdrop-blur-xl md:p-5 ${
-                      latestAgents[effectiveFocusedIndex].status === "imposter"
-                        ? "border-rose-500/70 fui-imposter-flicker"
-                        : "border-cyan-400/60 screen-glow-breathe"
-                    }`}
-                    style={{
-                      fontFamily: "var(--font-fui-mono)",
-                      backgroundImage:
-                        "linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)), linear-gradient(rgba(6,182,212,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.08) 1px, transparent 1px)",
-                      backgroundSize: "auto, 12px 12px, 12px 12px",
-                    }}
-                  >
-                    {/* Tab */}
-                    <div className="mb-3 inline-flex max-w-full border border-cyan-500/40 bg-slate-950/90 px-4 py-1.5 text-[9px] uppercase tracking-[0.24em] text-cyan-200">
-                      AGENT_{latestAgents[effectiveFocusedIndex].codename.replace(/\s/g, "_")}
-                    </div>
-
-                    <div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
-                      {/* Hex profile on the left */}
-                      <div className="relative h-28 w-28 shrink-0 md:h-32 md:w-32">
-                        <div
-                          className={`fui-scan-ring absolute -inset-2 rounded-full border-2 border-dashed ${
-                            latestAgents[effectiveFocusedIndex].status === "approved"
-                              ? "border-emerald-400/70"
-                              : latestAgents[effectiveFocusedIndex].status === "imposter"
-                              ? "border-rose-400/70"
-                              : "border-amber-400/70"
-                          }`}
-                        />
-                        <div
-                          className={`fui-hex-mask absolute inset-0 overflow-hidden bg-slate-800 ${statusGlow(
-                            latestAgents[effectiveFocusedIndex].status
-                          )}`}
-                        >
-                          {latestAgents[effectiveFocusedIndex].photoDataUrl ? (
-                            <img
-                              src={latestAgents[effectiveFocusedIndex].photoDataUrl}
-                              alt=""
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-slate-500">
-                              —
-                            </div>
-                          )}
+                {/* Focused FUI card (center) — reference AgentCard layout */}
+                {latestAgents[effectiveFocusedIndex] && (() => {
+                  const agent = latestAgents[effectiveFocusedIndex];
+                  const isImposter = agent.status === "imposter";
+                  const statusDisplay =
+                    agent.status === "approved"
+                      ? "APPROVED"
+                      : agent.status === "imposter"
+                        ? "IMPOSTER"
+                        : "PENDING"; // double-agent shown as PENDING
+                  const statusColor =
+                    agent.status === "double-agent"
+                      ? "text-amber-400 border-amber-500/50"
+                      : isImposter
+                        ? "text-red-500 border-red-500/50"
+                        : "text-cyan-400 border-cyan-500/50";
+                  const hexGlow =
+                    agent.status === "double-agent"
+                      ? "shadow-[0_0_15px_rgba(251,191,36,0.4)]"
+                      : isImposter
+                        ? "shadow-[0_0_15px_rgba(239,68,68,0.4)]"
+                        : "shadow-[0_0_15px_rgba(34,211,238,0.4)]";
+                  return (
+                    <div
+                      className={`absolute left-1/2 top-1/2 z-20 w-full max-w-md -translate-x-1/2 -translate-y-1/2 p-[1px] ${
+                        isImposter ? "bg-red-500/30 fui-imposter-flicker" : "bg-cyan-500/30"
+                      }`}
+                      style={{
+                        clipPath:
+                          "polygon(0% 15px, 15px 0%, 100% 0%, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0% 100%)",
+                      }}
+                    >
+                      <div
+                        className="bg-slate-950/90 backdrop-blur-xl p-4 flex flex-col gap-4 md:p-6"
+                        style={{
+                          clipPath:
+                            "polygon(0% 14px, 14px 0%, 100% 0%, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0% 100%)",
+                          fontFamily: "var(--font-fui-mono)",
+                        }}
+                      >
+                        {/* Top ID Tab */}
+                        <div className="flex justify-between items-center border-b border-cyan-900/50 pb-2">
+                          <span className="font-mono text-[10px] tracking-[0.2em] text-cyan-500/70 uppercase">
+                            AGENT_REF_ID: {agent.id.slice(-8)}
+                          </span>
+                          <div className="flex gap-1">
+                            {[1, 2, 3].map((i) => (
+                              <div
+                                key={i}
+                                className="w-1 h-1 bg-cyan-500/50 rotate-45"
+                              />
+                            ))}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Copy on the right */}
-                      <div className="min-w-0 flex-1 text-center md:text-left">
-                        <p className="text-[9px] uppercase tracking-[0.32em] text-cyan-400/80">
-                          CODENAME
-                        </p>
-                        <p
-                          className="mt-1 text-2xl font-semibold tracking-wide text-cyan-50 md:text-3xl"
-                          style={{ fontFamily: "var(--font-geist-sans)" }}
-                        >
-                          {latestAgents[effectiveFocusedIndex].codename}
-                        </p>
+                        <div className="flex gap-4 items-start">
+                          {/* Hexagon Image + Scan Ring */}
+                          <div className="relative shrink-0">
+                            <div
+                              className={`w-24 h-24 bg-cyan-500/20 p-1 ${hexGlow}`}
+                              style={{
+                                clipPath:
+                                  "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                              }}
+                            >
+                              {agent.photoDataUrl ? (
+                                <img
+                                  src={agent.photoDataUrl}
+                                  alt={agent.codename}
+                                  className="w-full h-full object-cover"
+                                  style={{
+                                    clipPath:
+                                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                                  }}
+                                />
+                              ) : (
+                                <div
+                                  className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500 text-xs"
+                                  style={{
+                                    clipPath:
+                                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                                  }}
+                                >
+                                  —
+                                </div>
+                              )}
+                            </div>
+                            <div
+                              className="fui-scan-ring absolute -top-1 -left-1 -right-1 -bottom-1 border border-dashed border-cyan-500/30 rounded-full pointer-events-none"
+                              style={{ animationDuration: "10s" }}
+                            />
+                          </div>
 
-                        <div className="mt-3 flex items-center justify-center gap-2 md:justify-start">
-                          <span
-                            className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide ${
-                              latestAgents[effectiveFocusedIndex].status === "approved"
-                                ? "bg-emerald-500 text-emerald-950 shadow-[0_0_22px_rgba(16,185,129,0.8)]"
-                                : latestAgents[effectiveFocusedIndex].status === "double-agent"
-                                ? "bg-amber-400 text-amber-950 shadow-[0_0_22px_rgba(251,191,36,0.8)]"
-                                : "bg-rose-500 text-rose-950 shadow-[0_0_22px_rgba(244,63,94,0.8)]"
-                            }`}
-                          >
-                            {statusLabel(latestAgents[effectiveFocusedIndex].status)}
+                          {/* Details */}
+                          <div className="flex flex-col gap-1 min-w-0 flex-1">
+                            <span className="font-mono text-[10px] text-slate-400 uppercase tracking-widest">
+                              Codename
+                            </span>
+                            <h2 className="text-xl font-bold text-white tracking-tighter uppercase leading-none md:text-2xl">
+                              {agent.codename}
+                            </h2>
+                            <div
+                              className={`mt-2 inline-block px-3 py-1 text-[10px] font-bold border rounded-sm bg-black/20 animate-pulse ${statusColor}`}
+                            >
+                              {statusDisplay} AGENT
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Description Section */}
+                        <div className="relative mt-2 border-t border-cyan-900/50 pt-4">
+                          {agent.story && (
+                            <p className="font-mono text-xs leading-relaxed text-slate-300 antialiased">
+                              <span className="text-cyan-500 mr-2 opacity-50">
+                                &gt;&gt;
+                              </span>
+                              {agent.story}
+                            </p>
+                          )}
+                          <div className="absolute bottom-0 right-0 w-8 h-8 opacity-20 border-r border-b border-cyan-400" />
+                        </div>
+
+                        {/* System Source Footer */}
+                        <div className="flex justify-between items-center opacity-30 font-mono text-[8px] text-cyan-500 uppercase mt-2">
+                          <span>SRC: DB.ALPHA_V.2.0</span>
+                          <span className="flex items-center gap-2">
+                            <div className="w-8 h-[1px] bg-cyan-500" />
+                            GRID_REF_029
                           </span>
                         </div>
-
-                        {/* Divider line */}
-                        <div className="mt-4 h-px w-full bg-slate-700/80" />
-
-                        {latestAgents[effectiveFocusedIndex].story && (
-                          <p className="mt-3 text-xs leading-relaxed text-slate-200 md:text-sm">
-                            {latestAgents[effectiveFocusedIndex].story}
-                          </p>
-                        )}
-
-                        <div className="mt-2 flex items-center justify-between text-[9px] text-slate-500">
-                          <span>SRC: DB.ALPHA</span>
-                          <svg
-                            className="h-3 w-10 text-cyan-500/70"
-                            viewBox="0 0 40 12"
-                            preserveAspectRatio="none"
-                          >
-                            <polyline
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="0.7"
-                              points="0,10 4,6 9,8 14,4 20,6 26,2 32,5 38,1"
-                            />
-                          </svg>
-                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </>
             )}
           </section>

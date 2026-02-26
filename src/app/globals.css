@@ -70,13 +70,13 @@ body {
     transform: translate(0, 0) rotate(-1deg);
   }
   25% {
-    transform: translate(6px, -8px) rotate(1deg);
+    transform: translate(4px, -4px) rotate(0.8deg);
   }
   50% {
-    transform: translate(-4px, 4px) rotate(0deg);
+    transform: translate(-3px, 3px) rotate(0deg);
   }
   75% {
-    transform: translate(-6px, -4px) rotate(0.5deg);
+    transform: translate(-4px, -2px) rotate(0.4deg);
   }
 }
 
