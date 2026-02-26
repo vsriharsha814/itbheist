@@ -20,6 +20,7 @@ type AgentDoc = {
   status: AgentStatus;
   photoDataUrl?: string;
   story?: string;
+  achievementTitle?: string;
 };
 
 function statusLabel(status: AgentStatus) {
@@ -41,48 +42,10 @@ function mapDoc(doc: DocumentData): AgentDoc {
     status: (data.status as AgentStatus) ?? "approved",
     photoDataUrl: data.photoDataUrl,
     story: data.story,
+    achievementTitle: data.achievementTitle,
   };
 }
 
-// Fake sparkline data (mini activity curve) — deterministic from id
-function sparkPath(id: string): string {
-  const seed = id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  const points: string[] = [];
-  const w = 60;
-  const h = 16;
-  for (let i = 0; i < 12; i++) {
-    const r =
-      Math.sin((seed + i) * 0.7) * 0.4 + Math.cos((seed + i) * 0.3) * 0.3;
-    const p = 50 + Math.round(r * 50);
-    const x = (i / 11) * w;
-    const y = h - (p / 100) * h;
-    points.push(`${x},${y}`);
-  }
-  return points.join(" ");
-}
-
-// 16 non-overlapping slots: min ~18% apart so cards (8.5rem) never touch. Max 16 scattered = 1 focused + 16 scattered.
-const SCATTER_SLOTS = [
-  { left: 18, top: 20 },
-  { left: 38, top: 18 },
-  { left: 58, top: 20 },
-  { left: 78, top: 22 },
-  { left: 85, top: 38 },
-  { left: 82, top: 56 },
-  { left: 72, top: 72 },
-  { left: 52, top: 80 },
-  { left: 32, top: 78 },
-  { left: 18, top: 68 },
-  { left: 12, top: 52 },
-  { left: 14, top: 36 },
-  { left: 28, top: 48 },
-  { left: 50, top: 48 },
-  { left: 68, top: 50 },
-  { left: 50, top: 64 },
-];
-const MAX_SCATTERED = SCATTER_SLOTS.length;
-
-const FOCUS_DURATION_MS = 8000;
 const PARALLAX_SENSITIVITY = 0.012;
 
 export default function ScreenPage() {
@@ -90,16 +53,15 @@ export default function ScreenPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [qrValue, setQrValue] = useState<string | null>(null);
-  const [focusedIndex, setFocusedIndex] = useState(0);
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
-  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [clock, setClock] = useState("");
   const [coords, setCoords] = useState("0.00 / 0.00");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setQrValue(`${window.location.origin}/agent`);
-    }
+    if (typeof window === "undefined") return;
+    const base =
+      process.env.NEXT_PUBLIC_APP_URL?.trim() || window.location.origin;
+    setQrValue(`${base.replace(/\/$/, "")}/agent`);
   }, []);
 
   useEffect(() => {
@@ -127,16 +89,6 @@ export default function ScreenPage() {
     );
     return () => unsubscribe();
   }, []);
-
-  // Cycle focus within displayed set only (capped so scattered count ≤ slots = no overlap)
-  useEffect(() => {
-    const n = Math.min(agents.length, MAX_SCATTERED + 1);
-    if (n <= 1) return;
-    const id = setInterval(() => {
-      setFocusedIndex((i) => (i + 1) % n);
-    }, FOCUS_DURATION_MS);
-    return () => clearInterval(id);
-  }, [agents.length]);
 
   // Parallax: subtle 3D tilt from mouse
   const onMouseMove = useCallback((e: React.MouseEvent) => {
@@ -179,16 +131,6 @@ export default function ScreenPage() {
     }, 2000);
     return () => clearInterval(id);
   }, []);
-
-  const latestAgents = useMemo(
-    () => agents.slice(0, MAX_SCATTERED + 1),
-    [agents]
-  );
-
-  const effectiveFocusedIndex =
-    latestAgents.length > 0
-      ? Math.min(focusedIndex, latestAgents.length - 1)
-      : 0;
 
   const transformStyle = useMemo(
     () => ({
@@ -304,45 +246,8 @@ export default function ScreenPage() {
             </Link>
           </header>
 
-          {/* Circuit traces: center to each card (more visible, moving dash) */}
-          {latestAgents.length > 0 && (
-            <svg
-              className="pointer-events-none fixed inset-0 z-0 h-full w-full"
-              style={{ opacity: 0.38 }}
-            >
-              <defs>
-                <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="rgba(6,182,212,0.5)" />
-                  <stop offset="100%" stopColor="rgba(6,182,212,0.08)" />
-                </linearGradient>
-              </defs>
-              {latestAgents.map((_, i) => {
-                if (i === effectiveFocusedIndex) return null;
-                const slotIdx = i < effectiveFocusedIndex ? i : i - 1;
-                const slot = SCATTER_SLOTS[slotIdx % SCATTER_SLOTS.length];
-                const cx = 50;
-                const cy = 45;
-                const x2 = slot.left;
-                const y2 = slot.top;
-                return (
-                  <line
-                    key={i}
-                    x1={`${cx}%`}
-                    y1={`${cy}%`}
-                    x2={`${x2}%`}
-                    y2={`${y2}%`}
-                    stroke="url(#lineGrad)"
-                    strokeWidth="0.6"
-                    strokeDasharray="4 3"
-                    className="fui-circuit-line"
-                  />
-                );
-              })}
-            </svg>
-          )}
-
-          {/* Canvas: cards */}
-          <section className="relative flex-1 px-2 pb-28 pt-2 md:px-4">
+          {/* Scrollable grid: every agent gets a full-detail card (codename, achievement, story) */}
+          <section className="relative flex-1 overflow-y-auto px-2 pb-28 pt-2 md:px-4">
             {loading ? (
               <div className="flex min-h-[40vh] items-center justify-center">
                 <p
@@ -356,7 +261,7 @@ export default function ScreenPage() {
               <div className="flex min-h-[40vh] items-center justify-center">
                 <p className="text-sm text-rose-300">{error}</p>
               </div>
-            ) : latestAgents.length === 0 ? (
+            ) : agents.length === 0 ? (
               <div className="flex min-h-[40vh] items-center justify-center">
                 <p
                   className="max-w-sm text-center text-sm text-slate-400"
@@ -366,16 +271,8 @@ export default function ScreenPage() {
                 </p>
               </div>
             ) : (
-              <>
-                {/* Small FUI cards — compact version of AgentCard */}
-                {latestAgents.map((agent, i) => {
-                  if (i === effectiveFocusedIndex) return null;
-                  const unfocusedRank = i < effectiveFocusedIndex ? i : i - 1;
-                  const slotIdx = unfocusedRank;
-                  const slot = SCATTER_SLOTS[slotIdx];
-                  const isHovered = hoveredCardId === agent.id;
-                  const isDimmed =
-                    hoveredCardId != null && hoveredCardId !== agent.id;
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {agents.map((agent) => {
                   const isImposter = agent.status === "imposter";
                   const statusDisplay =
                     agent.status === "approved"
@@ -395,133 +292,15 @@ export default function ScreenPage() {
                       : isImposter
                         ? "shadow-[0_0_10px_rgba(239,68,68,0.4)]"
                         : "shadow-[0_0_10px_rgba(34,211,238,0.4)]";
-
                   return (
                     <div
                       key={agent.id}
-                      className="agent-float absolute z-10"
-                      style={{
-                        left: `${slot.left}%`,
-                        top: `${slot.top}%`,
-                        transform: "translate(-50%, -50%)",
-                        animationDelay: `${(slotIdx % 6) * 2.5}s`,
-                        width: "8.5rem",
-                      }}
-                    >
-                      <div
-                        className={`fui-bloom border bg-slate-950/90 backdrop-blur-md ${
-                          isImposter
-                            ? "border-red-500/60 fui-imposter-flicker"
-                            : "border-cyan-500/40"
-                        } ${isDimmed ? "opacity-50 blur-[1px]" : ""}`}
-                        style={{
-                          transform: `perspective(420px) rotateX(${2 - (slotIdx % 5) * 0.6}deg) rotateY(${(slotIdx % 3) * 0.9}deg)${isHovered ? " scale(1.05)" : ""}`,
-                          transition: "transform 0.2s ease",
-                          fontFamily: "var(--font-fui-mono)",
-                          clipPath:
-                            "polygon(0% 12px, 12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%)",
-                        }}
-                        onMouseEnter={() => setHoveredCardId(agent.id)}
-                        onMouseLeave={() => setHoveredCardId(null)}
-                      >
-                        {/* Tab: Agent ID + small indicator diamonds */}
-                        <div className="flex items-center justify-between border-b border-cyan-900/40 bg-cyan-500/10 px-2 py-1">
-                          <span className="font-mono text-[8px] tracking-[0.2em] text-cyan-300/80 uppercase">
-                            ID:{agent.id.slice(-6)}
-                          </span>
-                          <div className="flex gap-0.5">
-                            {[1, 2].map((j) => (
-                              <div
-                                key={j}
-                                className="h-1 w-1 rotate-45 bg-cyan-500/60"
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2 px-2 py-2">
-                          {/* Hex photo + scan ring */}
-                          <div className="relative shrink-0">
-                            <div
-                              className={`h-10 w-10 bg-cyan-500/20 p-[2px] ${hexGlow}`}
-                              style={{
-                                clipPath:
-                                  "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                              }}
-                            >
-                              {agent.photoDataUrl ? (
-                                <img
-                                  src={agent.photoDataUrl}
-                                  alt={agent.codename}
-                                  className="h-full w-full object-cover"
-                                  style={{
-                                    clipPath:
-                                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                                  }}
-                                />
-                              ) : (
-                                <div
-                                  className="flex h-full w-full items-center justify-center text-[9px] text-slate-500"
-                                  style={{
-                                    clipPath:
-                                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                                  }}
-                                >
-                                  —
-                                </div>
-                              )}
-                            </div>
-                            <div
-                              className="fui-scan-ring pointer-events-none absolute -inset-1 rounded-full border border-dashed border-cyan-500/30"
-                              style={{ animationDuration: "10s" }}
-                            />
-                          </div>
-
-                          {/* Codename + status */}
-                          <div className="min-w-0 flex-1">
-                            <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-slate-400">
-                              Codename
-                            </p>
-                            <p className="truncate text-[11px] font-semibold uppercase tracking-tight text-cyan-50">
-                              {agent.codename}
-                            </p>
-                            <div
-                              className={`mt-1 inline-block rounded-sm border px-2 py-0.5 text-[8px] font-bold ${statusColor}`}
-                            >
-                              {statusDisplay}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {/* Focused FUI card (center) — reference AgentCard layout */}
-                {latestAgents[effectiveFocusedIndex] && (() => {
-                  const agent = latestAgents[effectiveFocusedIndex];
-                  const isImposter = agent.status === "imposter";
-                  const statusDisplay =
-                    agent.status === "approved"
-                      ? "APPROVED"
-                      : agent.status === "imposter"
-                        ? "IMPOSTER"
-                        : "PENDING"; // double-agent shown as PENDING
-                  const statusColor =
-                    agent.status === "double-agent"
-                      ? "text-amber-400 border-amber-500/50"
-                      : isImposter
-                        ? "text-red-500 border-red-500/50"
-                        : "text-cyan-400 border-cyan-500/50";
-                  const hexGlow =
-                    agent.status === "double-agent"
-                      ? "shadow-[0_0_15px_rgba(251,191,36,0.4)]"
-                      : isImposter
-                        ? "shadow-[0_0_15px_rgba(239,68,68,0.4)]"
-                        : "shadow-[0_0_15px_rgba(34,211,238,0.4)]";
-                  return (
-                    <div
-                      className={`absolute left-1/2 top-1/2 z-20 w-full max-w-md -translate-x-1/2 -translate-y-1/2 p-[1px] ${
-                        isImposter ? "bg-red-500/30 fui-imposter-flicker" : "bg-cyan-500/30"
+                      className={`p-[1px] ${
+                        isImposter
+                          ? "bg-red-500/30 fui-imposter-flicker"
+                          : agent.status === "double-agent"
+                            ? "bg-amber-500/25"
+                            : "bg-cyan-500/30"
                       }`}
                       style={{
                         clipPath:
@@ -529,108 +308,112 @@ export default function ScreenPage() {
                       }}
                     >
                       <div
-                        className="bg-slate-950/90 backdrop-blur-xl p-4 flex flex-col gap-4 md:p-6"
+                        className="fui-bloom bg-slate-950/90 backdrop-blur-md"
                         style={{
+                          fontFamily: "var(--font-fui-mono)",
                           clipPath:
                             "polygon(0% 14px, 14px 0%, 100% 0%, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0% 100%)",
-                          fontFamily: "var(--font-fui-mono)",
                         }}
                       >
-                        {/* Top ID Tab */}
-                        <div className="flex justify-between items-center border-b border-cyan-900/50 pb-2">
-                          <span className="font-mono text-[10px] tracking-[0.2em] text-cyan-500/70 uppercase">
-                            AGENT_REF_ID: {agent.id.slice(-8)}
-                          </span>
-                          <div className="flex gap-1">
-                            {[1, 2, 3].map((i) => (
-                              <div
-                                key={i}
-                                className="w-1 h-1 bg-cyan-500/50 rotate-45"
-                              />
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="flex gap-4 items-start">
-                          {/* Hexagon Image + Scan Ring */}
-                          <div className="relative shrink-0">
+                      <div className="flex justify-between items-center border-b border-cyan-900/50 pb-2 pt-1.5 px-3">
+                        <span className="font-mono text-[10px] tracking-[0.2em] text-cyan-500/70 uppercase">
+                          AGENT_REF_ID: {agent.id.slice(-8)}
+                        </span>
+                        <div className="flex gap-1">
+                          {[1, 2, 3].map((j) => (
                             <div
-                              className={`w-24 h-24 bg-cyan-500/20 p-1 ${hexGlow}`}
-                              style={{
-                                clipPath:
-                                  "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                              }}
-                            >
-                              {agent.photoDataUrl ? (
-                                <img
-                                  src={agent.photoDataUrl}
-                                  alt={agent.codename}
-                                  className="w-full h-full object-cover"
-                                  style={{
-                                    clipPath:
-                                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                                  }}
-                                />
-                              ) : (
-                                <div
-                                  className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500 text-xs"
-                                  style={{
-                                    clipPath:
-                                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                                  }}
-                                >
-                                  —
-                                </div>
-                              )}
-                            </div>
-                            <div
-                              className="fui-scan-ring absolute -top-1 -left-1 -right-1 -bottom-1 border border-dashed border-cyan-500/30 rounded-full pointer-events-none"
-                              style={{ animationDuration: "10s" }}
+                              key={j}
+                              className="h-1 w-1 rotate-45 bg-cyan-500/50"
                             />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex gap-3 p-3">
+                        <div className="relative shrink-0">
+                          <div
+                            className={`h-16 w-16 bg-cyan-500/20 p-[2px] ${hexGlow}`}
+                            style={{
+                              clipPath:
+                                "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                            }}
+                          >
+                            {agent.photoDataUrl ? (
+                              <img
+                                src={agent.photoDataUrl}
+                                alt={agent.codename}
+                                className="h-full w-full object-cover"
+                                style={{
+                                  clipPath:
+                                    "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                                }}
+                              />
+                            ) : (
+                              <div
+                                className="flex h-full w-full items-center justify-center text-[10px] text-slate-500"
+                                style={{
+                                  clipPath:
+                                    "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                                }}
+                              >
+                                —
+                              </div>
+                            )}
                           </div>
-
-                          {/* Details */}
-                          <div className="flex flex-col gap-1 min-w-0 flex-1">
-                            <span className="font-mono text-[10px] text-slate-400 uppercase tracking-widest">
-                              Codename
+                          <div
+                            className="fui-scan-ring pointer-events-none absolute -inset-1 rounded-full border border-dashed border-cyan-500/30"
+                            style={{ animationDuration: "10s" }}
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-mono text-[10px] text-slate-400 uppercase tracking-widest">
+                            Codename
+                          </p>
+                          <p className="text-sm font-bold uppercase tracking-tighter text-cyan-50 leading-tight md:text-base">
+                            {agent.codename}
+                          </p>
+                          <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.15em] text-cyan-500/80">
+                            Achievement
+                          </p>
+                          <p className="text-xs font-medium text-cyan-200/90">
+                            {agent.achievementTitle ?? "—"}
+                          </p>
+                          <div
+                            className={`mt-2 inline-block rounded-sm border px-3 py-1 text-[10px] font-bold bg-black/20 ${statusColor}`}
+                          >
+                            {statusDisplay} AGENT
+                          </div>
+                        </div>
+                      </div>
+                      <div className="relative border-t border-cyan-900/50 pt-3 px-3 pb-2">
+                        {agent.story ? (
+                          <p className="font-mono text-[11px] leading-relaxed text-slate-300">
+                            <span className="text-cyan-500 mr-1.5 opacity-50">
+                              &gt;&gt;
                             </span>
-                            <h2 className="text-xl font-bold text-white tracking-tighter uppercase leading-none md:text-2xl">
-                              {agent.codename}
-                            </h2>
-                            <div
-                              className={`mt-2 inline-block px-3 py-1 text-[10px] font-bold border rounded-sm bg-black/20 animate-pulse ${statusColor}`}
-                            >
-                              {statusDisplay} AGENT
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Description Section */}
-                        <div className="relative mt-2 border-t border-cyan-900/50 pt-4">
-                          {agent.story && (
-                            <p className="font-mono text-xs leading-relaxed text-slate-300 antialiased">
-                              <span className="text-cyan-500 mr-2 opacity-50">
-                                &gt;&gt;
-                              </span>
-                              {agent.story}
-                            </p>
-                          )}
-                          <div className="absolute bottom-0 right-0 w-8 h-8 opacity-20 border-r border-b border-cyan-400" />
-                        </div>
-
-                        {/* System Source Footer */}
-                        <div className="flex justify-between items-center opacity-30 font-mono text-[8px] text-cyan-500 uppercase mt-2">
-                          <span>SRC: DB.ALPHA_V.2.0</span>
-                          <span className="flex items-center gap-2">
-                            <div className="w-8 h-[1px] bg-cyan-500" />
-                            GRID_REF_029
-                          </span>
-                        </div>
+                            {agent.story}
+                          </p>
+                        ) : (
+                          <p className="font-mono text-[11px] text-slate-500">
+                            <span className="text-cyan-500 mr-1.5 opacity-50">
+                              &gt;&gt;
+                            </span>
+                            —
+                          </p>
+                        )}
+                        <div className="absolute bottom-0 right-0 w-8 h-8 opacity-20 border-r border-b border-cyan-400" />
+                      </div>
+                      <div className="flex justify-between items-center px-3 py-1.5 opacity-30 font-mono text-[8px] text-cyan-500 uppercase border-t border-cyan-900/30">
+                        <span>SRC: DB.ALPHA_V.2.0</span>
+                        <span className="flex items-center gap-2">
+                          <div className="w-8 h-[1px] bg-cyan-500" />
+                          GRID_REF_029
+                        </span>
+                      </div>
                       </div>
                     </div>
                   );
-                })()}
-              </>
+                })}
+              </div>
             )}
           </section>
 
