@@ -1,11 +1,27 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  serverTimestamp,
+  type DocumentData,
+} from "firebase/firestore";
+import { AGENT_TEMPLATES, type AgentTemplate } from "@/data/agent-templates";
 import { getDb } from "@/lib/firebase";
 import Link from "next/link";
 
 type AgentStatus = "approved" | "double-agent" | "imposter";
+
+function pickTemplate(usedCodeNames: string[]): AgentTemplate {
+  const available = AGENT_TEMPLATES.filter(
+    (t) => !usedCodeNames.includes(t.code_name)
+  );
+  const pool = available.length > 0 ? available : AGENT_TEMPLATES;
+  const idx = Math.floor(Math.random() * pool.length);
+  return pool[idx];
+}
 
 async function optimizeImageToPassport(file: File): Promise<string> {
   const MAX_WIDTH = 480; // roughly passport ratio 3:4
@@ -71,50 +87,6 @@ async function optimizeImageToPassport(file: File): Promise<string> {
   });
 }
 
-function generateStory(codename: string, status: AgentStatus): string {
-  const base =
-    status === "approved"
-      ? "cleared every background check and still sings on pitch under pressure."
-      : status === "double-agent"
-      ? "has been spotted cheering for both rival sections and somehow gets away with it."
-      : "managed to sneak past three checkpoints before admitting they just wanted snacks.";
-
-  return `Agent ${codename} ${base}`;
-}
-
-function generateCodename() {
-  const adjectives = [
-    "Velvet",
-    "Midnight",
-    "Ghost",
-    "Neon",
-    "Crimson",
-    "Static",
-    "Phantom",
-    "Cipher",
-    "Echo",
-    "Specter",
-  ];
-  const nouns = [
-    "Falcon",
-    "Chorus",
-    "Tenor",
-    "Bassline",
-    "Harmony",
-    "Shadow",
-    "Cipher",
-    "Network",
-    "Signal",
-    "Whisper",
-  ];
-
-  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  const num = String(Math.floor(Math.random() * 99)).padStart(2, "0");
-
-  return `${adj} ${noun}-${num}`;
-}
-
 function generateStatus(): AgentStatus {
   const roll = Math.random();
   if (roll < 0.65) return "approved";
@@ -151,6 +123,31 @@ export default function AgentPage() {
   const [error, setError] = useState<string | null>(null);
   const [codename, setCodename] = useState<string | null>(null);
   const [status, setStatus] = useState<AgentStatus | null>(null);
+  const [usedCodeNames, setUsedCodeNames] = useState<string[]>([]);
+
+  // Load already-used codenames so we can prefer unused templates
+  useEffect(() => {
+    const db = getDb();
+    if (!db) return;
+
+    const load = async () => {
+      try {
+        const snap = await getDocs(collection(db, "agents"));
+        const names: string[] = [];
+        snap.forEach((doc) => {
+          const data = doc.data() as DocumentData;
+          if (data?.codename && typeof data.codename === "string") {
+            names.push(data.codename);
+          }
+        });
+        setUsedCodeNames(Array.from(new Set(names)));
+      } catch (err) {
+        console.error("Failed to load existing agent codenames", err);
+      }
+    };
+
+    void load();
+  }, []);
 
   const disabled = useMemo(() => loading || !file, [loading, file]);
 
@@ -184,7 +181,8 @@ export default function AgentPage() {
         setLoading(true);
         setError(null);
 
-        const newCodename = generateCodename();
+        const template = pickTemplate(usedCodeNames);
+        const newCodename = template.code_name;
         const newStatus = generateStatus();
 
         const db = getDb();
@@ -193,13 +191,13 @@ export default function AgentPage() {
         }
 
         const optimizedPhoto = await optimizeImageToPassport(file);
-        const story = generateStory(newCodename, newStatus);
 
         await addDoc(collection(db, "agents"), {
           codename: newCodename,
           status: newStatus,
           photoDataUrl: optimizedPhoto,
-          story,
+          story: template.story,
+          achievementTitle: template.achievement_title,
           createdAt: serverTimestamp(),
         });
 
@@ -208,6 +206,9 @@ export default function AgentPage() {
 
         setCodename(newCodename);
         setStatus(newStatus);
+        setUsedCodeNames((prev) =>
+          prev.includes(newCodename) ? prev : [...prev, newCodename]
+        );
       } catch (err) {
         console.error(err);
         setError(
@@ -217,7 +218,7 @@ export default function AgentPage() {
         setLoading(false);
       }
     },
-    [file]
+    [file, usedCodeNames]
   );
 
   return (
