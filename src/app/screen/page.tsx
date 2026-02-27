@@ -519,16 +519,16 @@ export default function ScreenPage() {
                       animation: "roster-infinite-scroll 30s linear infinite",
                     }}
                   >
-                    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
-                      {[0, 1].map((loop) =>
-                        agents.map((agent, index) => (
-                          <SmallAgentCard
-                            key={`${agent.id}-${loop}-${index}`}
-                            agent={agent}
-                          />
-                        ))
-                      )}
-                    </div>
+                    {[0, 1].map((loop) => (
+                      <div
+                        key={loop}
+                        className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10"
+                      >
+                        {agents.map((agent) => (
+                          <SmallAgentCard key={`${agent.id}-${loop}`} agent={agent} />
+                        ))}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
