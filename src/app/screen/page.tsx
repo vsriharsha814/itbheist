@@ -535,7 +535,7 @@ export default function ScreenPage() {
       {/* Center card: outside tilt container so fixed is viewport-relative; left/top 50% + translate for true center */}
       {!loading && !error && agents.length > 0 && (
         <div className="pointer-events-none fixed inset-0 z-10">
-          <div className="pointer-events-auto absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 px-4">
+          <div className="pointer-events-auto absolute left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 px-4 md:px-6">
             {focusedAgent && (() => {
               const agent = focusedAgent;
               const isImposter = agent.status === "imposter";
@@ -557,6 +557,15 @@ export default function ScreenPage() {
                   : isImposter
                     ? "shadow-[0_0_15px_rgba(239,68,68,0.4)]"
                     : "shadow-[0_0_15px_rgba(34,211,238,0.4)]";
+              const totalSegments = 16;
+              const highZoneSegments = 4;
+              const threatSegments =
+                agent.status === "imposter"
+                  ? 16
+                  : agent.status === "double-agent"
+                    ? 14
+                    : 12;
+              const [latStr, longStr] = coords.split("/").map((v) => v.trim());
               return (
                 <div
                   className={`p-[1px] ${
@@ -624,12 +633,43 @@ export default function ScreenPage() {
                         />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-mono text-[10px] text-slate-400 uppercase tracking-widest">
-                          Codename
-                        </p>
-                        <h2 className="text-xl font-bold uppercase tracking-tighter text-cyan-50 leading-tight md:text-2xl">
-                          {agent.codename}
-                        </h2>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="min-w-0">
+                            <p className="font-mono text-[10px] text-slate-400 uppercase tracking-widest">
+                              Codename
+                            </p>
+                            <h2 className="text-xl font-bold uppercase tracking-tighter text-cyan-50 leading-tight md:text-2xl">
+                              {agent.codename}
+                            </h2>
+                          </div>
+                          <div className="hidden sm:flex flex-col items-end gap-0.5">
+                            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400">
+                              Threat Level
+                            </p>
+                            <div className="flex h-2 items-center rounded-sm border border-cyan-500/40 bg-slate-950/80 px-[3px] py-0 gap-[1px]">
+                              {Array.from({ length: totalSegments }).map((_, idx) => {
+                                const isActive = idx < threatSegments;
+                                const isHigh = idx >= totalSegments - highZoneSegments;
+                                const baseColor = isHigh
+                                  ? "bg-red-500"
+                                  : "bg-cyan-500";
+                                const inactiveColor = "bg-slate-800";
+                                const opacityClass = !isActive
+                                  ? "opacity-40"
+                                  : isHigh
+                                    ? "opacity-100"
+                                    : "opacity-80";
+                                return (
+                                  // eslint-disable-next-line react/no-array-index-key
+                                  <div
+                                    key={idx}
+                                    className={`h-[6px] w-[6px] rounded-[1px] ${isActive ? baseColor : inactiveColor} ${opacityClass}`}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
                         <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.15em] text-cyan-500/80">
                           Achievement
                         </p>
@@ -640,6 +680,12 @@ export default function ScreenPage() {
                           className={`mt-2 inline-block rounded-sm border px-3 py-1 text-[10px] font-bold bg-black/20 ${statusColor}`}
                         >
                           {statusDisplay} AGENT
+                        </div>
+                        <div className="mt-1 space-y-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-cyan-400/80">
+                          <p>
+                            LAT {latStr || "--"}, LONG {longStr || "--"}
+                          </p>
+                          <p>GRID_REF_LOCK-ON: 029</p>
                         </div>
                       </div>
                     </div>
