@@ -305,6 +305,26 @@ export default function ScreenPage() {
     return () => clearInterval(id);
   }, []);
 
+  const MIN_SCROLL_AGENTS = 60;
+  const GRID_COLUMNS_DESKTOP = 10; // xl:grid-cols-10
+
+  const scrollAgents = useMemo(() => {
+    if (agents.length === 0) return [];
+
+    // We want:
+    // - at least 60 cards in a single cycle
+    // - a total count that is a multiple of the desktop column count (10)
+    const base = Math.max(agents.length, MIN_SCROLL_AGENTS);
+    const targetLength =
+      Math.ceil(base / GRID_COLUMNS_DESKTOP) * GRID_COLUMNS_DESKTOP;
+
+    const expanded: AgentDoc[] = new Array(targetLength);
+    for (let i = 0; i < targetLength; i++) {
+      expanded[i] = agents[i % agents.length];
+    }
+    return expanded;
+  }, [agents]);
+
   const transformStyle = useMemo(
     () => ({
       transform: `perspective(1200px) rotateX(${mouseTilt.x}deg) rotateY(${mouseTilt.y}deg)`,
@@ -514,16 +534,15 @@ export default function ScreenPage() {
                       animation: "roster-infinite-scroll 30s linear infinite",
                     }}
                   >
-                    {[0, 1].map((loop) => (
-                      <div
-                        key={loop}
-                        className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10"
-                      >
-                        {agents.map((agent) => (
-                          <SmallAgentCard key={`${agent.id}-${loop}`} agent={agent} />
-                        ))}
-                      </div>
-                    ))}
+                    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+                      {scrollAgents.concat(scrollAgents).map((agent, index) => (
+                        <SmallAgentCard
+                          // eslint-disable-next-line react/no-array-index-key
+                          key={`${agent.id}-${index}`}
+                          agent={agent}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
