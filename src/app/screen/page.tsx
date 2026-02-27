@@ -108,33 +108,28 @@ function SmallAgentCard({ agent }: { agent: AgentDoc }) {
         <div className="flex gap-1.5 p-1.5">
           <div className="relative shrink-0">
             <div
-              className={`w-9 aspect-[3/4] bg-cyan-500/20 p-[1px] ${hexGlow}`}
-              style={{
-                clipPath:
-                  "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-              }}
+              className={`relative w-9 aspect-[3/4] overflow-hidden rounded-full bg-slate-950/90 border border-cyan-500/40 shadow-[0_0_12px_rgba(34,211,238,0.35)] ${hexGlow}`}
             >
               {agent.photoDataUrl ? (
                 <img
                   src={agent.photoDataUrl}
                   alt=""
                   className="h-full w-full object-cover"
-                  style={{
-                    clipPath:
-                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                  }}
                 />
               ) : (
-                <div
-                  className="flex h-full w-full items-center justify-center text-[6px] text-slate-500"
-                  style={{
-                    clipPath:
-                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                  }}
-                >
+                <div className="flex h-full w-full items-center justify-center text-[6px] text-slate-500">
                   —
                 </div>
               )}
+              {/* Vignette overlay */}
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_45%,rgba(0,0,0,0.75)_100%)]" />
+              {/* Corner targeting brackets */}
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute left-0.5 top-0.5 h-1.5 w-1.5 border-l border-t border-cyan-400/80" />
+                <div className="absolute right-0.5 top-0.5 h-1.5 w-1.5 border-r border-t border-cyan-400/80" />
+                <div className="absolute left-0.5 bottom-0.5 h-1.5 w-1.5 border-l border-b border-cyan-400/80" />
+                <div className="absolute right-0.5 bottom-0.5 h-1.5 w-1.5 border-r border-b border-cyan-400/80" />
+              </div>
             </div>
           </div>
           <div className="min-w-0 flex-1">
@@ -600,33 +595,28 @@ export default function ScreenPage() {
                     <div className="flex gap-4 p-4">
                       <div className="relative shrink-0">
                         <div
-                          className={`w-24 aspect-[3/4] bg-cyan-500/20 p-1 ${hexGlow}`}
-                          style={{
-                            clipPath:
-                              "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                          }}
+                          className={`relative w-24 aspect-[3/4] overflow-hidden rounded-full bg-slate-950/90 border border-cyan-500/50 shadow-[0_0_24px_rgba(34,211,238,0.5)] ${hexGlow}`}
                         >
                           {agent.photoDataUrl ? (
                             <img
                               src={agent.photoDataUrl}
                               alt={agent.codename}
                               className="h-full w-full object-cover"
-                              style={{
-                                clipPath:
-                                  "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                              }}
                             />
                           ) : (
-                            <div
-                              className="flex h-full w-full items-center justify-center text-slate-500 text-xs"
-                              style={{
-                                clipPath:
-                                  "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                              }}
-                            >
+                            <div className="flex h-full w-full items-center justify-center text-slate-500 text-xs">
                               —
                             </div>
                           )}
+                          {/* Vignette overlay */}
+                          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_45%,rgba(0,0,0,0.8)_100%)]" />
+                          {/* Corner targeting brackets */}
+                          <div className="pointer-events-none absolute inset-0">
+                            <div className="absolute left-1.5 top-1.5 h-3 w-3 border-l border-t border-cyan-400/80" />
+                            <div className="absolute right-1.5 top-1.5 h-3 w-3 border-r border-t border-cyan-400/80" />
+                            <div className="absolute left-1.5 bottom-1.5 h-3 w-3 border-l border-b border-cyan-400/80" />
+                            <div className="absolute right-1.5 bottom-1.5 h-3 w-3 border-r border-b border-cyan-400/80" />
+                          </div>
                         </div>
                         <div
                           className="fui-scan-ring pointer-events-none absolute -inset-1 rounded-full border border-dashed border-cyan-500/30"
