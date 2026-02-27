@@ -108,7 +108,7 @@ function SmallAgentCard({ agent }: { agent: AgentDoc }) {
         <div className="flex gap-1.5 p-1.5">
           <div className="relative shrink-0">
             <div
-              className={`h-9 w-9 bg-cyan-500/20 p-[1px] ${hexGlow}`}
+              className={`w-9 aspect-[3/4] bg-cyan-500/20 p-[1px] ${hexGlow}`}
               style={{
                 clipPath:
                   "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
@@ -600,7 +600,7 @@ export default function ScreenPage() {
                     <div className="flex gap-4 p-4">
                       <div className="relative shrink-0">
                         <div
-                          className={`h-24 w-24 bg-cyan-500/20 p-1 ${hexGlow}`}
+                          className={`w-24 aspect-[3/4] bg-cyan-500/20 p-1 ${hexGlow}`}
                           style={{
                             clipPath:
                               "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
