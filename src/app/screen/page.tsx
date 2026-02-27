@@ -592,11 +592,11 @@ export default function ScreenPage() {
                       <span className="font-mono text-[10px] tracking-[0.2em] text-cyan-500/70 uppercase">
                         AGENT_REF_ID: {agent.id.slice(-8)}
                       </span>
-                      <div className="flex gap-1">
+                      <div className="flex gap-1.5">
                         {[1, 2, 3].map((j) => (
                           <div
                             key={j}
-                            className="h-1 w-1 rotate-45 bg-cyan-500/50"
+                            className="h-2 w-2 rotate-45 bg-cyan-500/70"
                           />
                         ))}
                       </div>
