@@ -418,29 +418,6 @@ export default function ScreenPage() {
             {clock}
           </div>
 
-          {/* Bottom-left: waveform in docked module — right above footnote text (ok if cut off at QR step) */}
-          <div
-            className="fixed left-3 z-40 flex flex-col items-center justify-center rounded border border-cyan-400/40 bg-slate-900/90 px-2.5 py-2"
-            style={{ bottom: "2.25rem" }}
-          >
-            <div className="flex h-8 items-end gap-0.5">
-              {Array.from({ length: 24 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-1 rounded-sm bg-cyan-500/50"
-                  style={{
-                    height: "60%",
-                    animation: "fui-wave 1.2s ease-in-out infinite",
-                    animationDelay: `${i * 0.05}s`,
-                  }}
-                />
-              ))}
-            </div>
-            <p className="mt-1 text-[6px] uppercase tracking-widest text-cyan-400/50">
-              SIGNAL
-            </p>
-          </div>
-
           {/* Background: left/right panels so center card doesn't cover any; center overlay cycles. */}
           <section className="relative flex flex-1 overflow-hidden pb-28 pt-11">
             {loading ? (
@@ -505,8 +482,21 @@ export default function ScreenPage() {
             "polygon(0% 100%, 0% 70%, calc(100% - 124px) 70%, calc(100% - 124px) 0%, 100% 0%, 100% 100%)",
         }}
       >
-        {/* Left: thin strip — text sits in the low part */}
-        <div className="flex min-h-0 min-w-0 flex-1 items-end pb-2 pl-4 pr-2 md:pl-6">
+        {/* Left: thin strip — waveform beside footnote text */}
+        <div className="flex min-h-0 min-w-0 flex-1 items-end gap-3 pb-2 pl-4 pr-2 md:pl-6">
+          <div className="flex h-6 shrink-0 items-end gap-0.5">
+            {Array.from({ length: 16 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-0.5 rounded-sm bg-cyan-500/50"
+                style={{
+                  height: "60%",
+                  animation: "fui-wave 1.2s ease-in-out infinite",
+                  animationDelay: `${i * 0.05}s`,
+                }}
+              />
+            ))}
+          </div>
           <div className="min-w-0 flex-1">
             <p className="text-[10px] text-cyan-300/90 leading-tight">
               <span className="text-emerald-400/90">USER</span>
