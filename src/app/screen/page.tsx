@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   collection,
   onSnapshot,
@@ -255,16 +255,29 @@ export default function ScreenPage() {
     agents.length > 0 ? focusedIndex % agents.length : 0;
   const focusedAgent = agents[effectiveFocusedIndex];
 
-  // Parallax: subtle 3D tilt from mouse
+  // Parallax: subtle 3D tilt from mouse (throttled to animation frames)
+  const frameRef = useRef<number | null>(null);
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+
   const onMouseMove = useCallback((e: React.MouseEvent) => {
-    const { clientX, clientY } = e;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const x = (clientX / w - 0.5) * 2;
-    const y = (clientY / h - 0.5) * 2;
-    setMouseTilt({
-      x: y * PARALLAX_SENSITIVITY * 8,
-      y: -x * PARALLAX_SENSITIVITY * 8,
+    if (typeof window === "undefined") return;
+    lastPointRef.current = { x: e.clientX, y: e.clientY };
+
+    if (frameRef.current != null) return;
+
+    frameRef.current = window.requestAnimationFrame(() => {
+      frameRef.current = null;
+      const point = lastPointRef.current;
+      if (!point) return;
+      const { x: clientX, y: clientY } = point;
+      const w = window.innerWidth || 1;
+      const h = window.innerHeight || 1;
+      const x = (clientX / w - 0.5) * 2;
+      const y = (clientY / h - 0.5) * 2;
+      setMouseTilt({
+        x: y * PARALLAX_SENSITIVITY * 8,
+        y: -x * PARALLAX_SENSITIVITY * 8,
+      });
     });
   }, []);
 
