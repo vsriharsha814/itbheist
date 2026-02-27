@@ -329,10 +329,10 @@ export default function ScreenPage() {
             "linear-gradient(180deg, rgba(6,182,212,0.03) 0%, transparent 50%, rgba(6,182,212,0.02) 100%)",
         }}
       />
-      {/* Data noise: scrolling hex strip (seamless loop) */}
+      {/* Data noise: scrolling hex strip — right above the footnote text (can be cut off by step at QR) */}
       <div
         className="pointer-events-none fixed left-0 right-0 z-30 overflow-hidden border-t border-cyan-500/20 bg-slate-950/60 py-1 font-[var(--font-fui-mono)] text-[9px] tracking-[0.3em] text-cyan-400/50"
-        style={{ fontFamily: "var(--font-fui-mono)", bottom: "4.25rem" }}
+        style={{ fontFamily: "var(--font-fui-mono)", bottom: "2.25rem" }}
         aria-hidden
       >
         <div className="fui-hex-scroll flex w-max">
@@ -418,19 +418,27 @@ export default function ScreenPage() {
             {clock}
           </div>
 
-          {/* Peripheral: bottom-left waveform (pulsing bars) */}
-          <div className="fixed bottom-20 left-3 z-40 flex h-8 items-end gap-0.5">
-            {Array.from({ length: 24 }).map((_, i) => (
-              <div
-                key={i}
-                className="w-1 rounded-sm bg-cyan-500/50"
-                style={{
-                  height: "60%",
-                  animation: "fui-wave 1.2s ease-in-out infinite",
-                  animationDelay: `${i * 0.05}s`,
-                }}
-              />
-            ))}
+          {/* Bottom-left: waveform in docked module — right above footnote text (ok if cut off at QR step) */}
+          <div
+            className="fixed left-3 z-40 flex flex-col items-center justify-center rounded border border-cyan-400/40 bg-slate-900/90 px-2.5 py-2"
+            style={{ bottom: "2.25rem" }}
+          >
+            <div className="flex h-8 items-end gap-0.5">
+              {Array.from({ length: 24 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-1 rounded-sm bg-cyan-500/50"
+                  style={{
+                    height: "60%",
+                    animation: "fui-wave 1.2s ease-in-out infinite",
+                    animationDelay: `${i * 0.05}s`,
+                  }}
+                />
+              ))}
+            </div>
+            <p className="mt-1 text-[6px] uppercase tracking-widest text-cyan-400/50">
+              SIGNAL
+            </p>
           </div>
 
           {/* Background: left/right panels so center card doesn't cover any; center overlay cycles. */}
@@ -488,39 +496,48 @@ export default function ScreenPage() {
         </main>
       </div>
 
-      {/* Footer: fixed to viewport (outside tilt so it doesn't tilt) */}
+      {/* Footer: single stepped platform — one clip-path, one background, QR inside the same block */}
       <footer
-        className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between gap-6 border-t border-cyan-500/25 bg-slate-950/95 px-4 py-3 backdrop-blur-md md:px-6"
-        style={{ fontFamily: "var(--font-fui-mono)" }}
+        className="fixed bottom-0 left-0 right-0 z-30 flex h-[120px] flex-row items-end border-t-2 border-cyan-500/50 bg-slate-950/95 backdrop-blur-md"
+        style={{
+          fontFamily: "var(--font-fui-mono)",
+          clipPath:
+            "polygon(0% 100%, 0% 70%, calc(100% - 124px) 70%, calc(100% - 124px) 0%, 100% 0%, 100% 100%)",
+        }}
       >
-        <div className="min-w-0 flex-1">
-          <p className="text-[11px] text-cyan-300/90">
-            <span className="text-emerald-400/90">USER</span>
-            <span className="text-cyan-500">@</span>
-            <span className="text-cyan-400">ROSTER</span>
-            <span className="text-slate-500">:~$</span>
-            <span className="ml-1 text-cyan-200/90">SCAN_TO_REGISTER_</span>
-            <span className="animate-pulse text-cyan-400">▌</span>
-          </p>
-          <p className="mt-0.5 text-[10px] text-slate-400">
-            Input required: scan QR with device camera to open Agent Scanner.
-          </p>
+        {/* Left: thin strip — text sits in the low part */}
+        <div className="flex min-h-0 min-w-0 flex-1 items-end pb-2 pl-4 pr-2 md:pl-6">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] text-cyan-300/90 leading-tight">
+              <span className="text-emerald-400/90">USER</span>
+              <span className="text-cyan-500">@</span>
+              <span className="text-cyan-400">ROSTER</span>
+              <span className="text-slate-500">:~$</span>
+              <span className="ml-1 text-cyan-200/90">SCAN_TO_REGISTER_</span>
+              <span className="animate-pulse text-cyan-400">▌</span>
+            </p>
+            <p className="mt-0.25 text-[9px] text-slate-400 leading-tight">
+              Input required: scan QR with device camera to open Agent Scanner.
+            </p>
+          </div>
         </div>
-        {/* System Access module: QR + scanning beam + rotating frame */}
-        <div className="fui-qr-rotate-frame relative flex shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-cyan-400/50 bg-slate-900/95 p-2.5 shadow-[0_0_28px_rgba(6,182,212,0.35)]">
-          <div className="fui-qr-scan-beam" />
-          {qrValue ? (
-            <QRCodeCanvas
-              value={qrValue}
-              size={100}
-              bgColor="#0f172a"
-              fgColor="#67e8f9"
-              includeMargin
-            />
-          ) : (
-            <div className="h-[100px] w-[100px] animate-pulse rounded bg-slate-800" />
-          )}
-          <p className="absolute -bottom-1 left-1 right-1 text-center text-[8px] uppercase tracking-widest text-cyan-400/70">
+        {/* Right: tall block is same footer — QR frame lives inside this platform */}
+        <div className="relative flex h-full w-[124px] shrink-0 items-center justify-center">
+          <div className="fui-qr-rotate-frame relative flex h-[108px] w-[108px] items-center justify-center overflow-hidden rounded border border-cyan-400/40 bg-slate-900/90">
+            <div className="fui-qr-scan-beam" />
+            {qrValue ? (
+              <QRCodeCanvas
+                value={qrValue}
+                size={100}
+                bgColor="#0f172a"
+                fgColor="#67e8f9"
+                includeMargin
+              />
+            ) : (
+              <div className="h-[100px] w-[100px] animate-pulse rounded bg-slate-800" />
+            )}
+          </div>
+          <p className="absolute bottom-2 left-0 right-0 text-center text-[7px] uppercase tracking-widest text-cyan-400/50">
             SYSTEM_ACCESS
           </p>
         </div>
