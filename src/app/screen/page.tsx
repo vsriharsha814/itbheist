@@ -416,18 +416,30 @@ export default function ScreenPage() {
         className="fixed left-0 right-0 top-0 z-30 flex shrink-0 items-center justify-between border-b border-cyan-500/25 bg-slate-950/95 px-4 py-2 backdrop-blur-md md:px-6"
         style={{ fontFamily: "var(--font-fui-mono)" }}
       >
-        <div className="flex items-center gap-2">
-          <span className="relative h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]">
-            <span className="absolute inset-0 animate-ping rounded-full bg-cyan-400 opacity-40" />
-          </span>
-          <p
-            className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100"
-            style={{ fontFamily: "var(--font-fui-mono)" }}
-          >
-            IN THE BUFF — AGENT ROSTER
-          </p>
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-2">
+            <span className="relative h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]">
+              <span className="absolute inset-0 animate-ping rounded-full bg-cyan-400 opacity-40" />
+            </span>
+            <p
+              className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100"
+              style={{ fontFamily: "var(--font-fui-mono)" }}
+            >
+              IN THE BUFF — AGENT ROSTER
+            </p>
+          </div>
+          <div className="text-[10px] uppercase tracking-widest text-cyan-400/70">
+            <span className="text-cyan-400/70">GRID.REF</span>
+            <span className="ml-1.5 text-cyan-300/90">{coords}</span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
+          <span
+            className="text-[11px] tabular-nums tracking-wider text-cyan-300/90"
+            style={{ fontFamily: "var(--font-fui-mono)" }}
+          >
+            {clock}
+          </span>
           <button
             type="button"
             onClick={toggleFullscreen}
@@ -461,23 +473,6 @@ export default function ScreenPage() {
         style={transformStyle}
       >
         <main className="relative flex min-h-screen flex-col">
-          {/* Peripheral: top-left coords */}
-          <div
-            className="fixed left-3 top-3 z-40 font-[var(--font-fui-mono)] text-[10px] uppercase tracking-widest text-cyan-400/70"
-            style={{ fontFamily: "var(--font-fui-mono)" }}
-          >
-            <div>GRID.REF</div>
-            <div className="mt-0.5 text-cyan-300/90">{coords}</div>
-          </div>
-
-          {/* Peripheral: top-right clock */}
-          <div
-            className="fixed right-3 top-3 z-40 font-[var(--font-fui-mono)] text-[11px] tabular-nums tracking-wider text-cyan-300/90"
-            style={{ fontFamily: "var(--font-fui-mono)" }}
-          >
-            {clock}
-          </div>
-
           {/* Background: left/right panels so center card doesn't cover any; center overlay cycles. */}
           <section className="relative flex flex-1 overflow-hidden pb-28 pt-11">
             {loading ? (
