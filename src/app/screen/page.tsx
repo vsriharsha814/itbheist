@@ -299,7 +299,7 @@ export default function ScreenPage() {
   useEffect(() => {
     const id = setInterval(() => {
       setCoords(
-        `${(Math.random() * 2 + 41).toFixed(2)} / ${(Math.random() * 2 + 17).toFixed(2)}`
+        `${(Math.random() * 2 + 41).toFixed(5)} / ${(Math.random() * 2 + 17).toFixed(5)}`
       );
     }, 2000);
     return () => clearInterval(id);
@@ -681,7 +681,7 @@ export default function ScreenPage() {
                         >
                           {statusDisplay} AGENT
                         </div>
-                        <div className="mt-1 space-y-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-cyan-400/80">
+                        <div className="mt-1 space-y-0.5 font-mono text-[8px] uppercase tracking-[0.16em] text-cyan-400/70">
                           <p>
                             LAT {latStr || "--"}, LONG {longStr || "--"}
                           </p>
