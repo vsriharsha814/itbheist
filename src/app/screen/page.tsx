@@ -535,7 +535,7 @@ export default function ScreenPage() {
       {/* Center card: outside tilt container so fixed is viewport-relative; left/top 50% + translate for true center */}
       {!loading && !error && agents.length > 0 && (
         <div className="pointer-events-none fixed inset-0 z-10">
-          <div className="pointer-events-auto absolute left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 px-4 md:px-6">
+          <div className="pointer-events-auto absolute left-1/2 top-1/2 w-full max-w-xl -translate-x-1/2 -translate-y-1/2 px-4 md:px-6">
             {focusedAgent && (() => {
               const agent = focusedAgent;
               const isImposter = agent.status === "imposter";
