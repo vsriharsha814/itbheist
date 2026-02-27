@@ -49,6 +49,138 @@ function mapDoc(doc: DocumentData): AgentDoc {
 const PARALLAX_SENSITIVITY = 0.012;
 const FOCUS_CYCLE_MS = 8000;
 
+function SmallAgentCard({ agent }: { agent: AgentDoc }) {
+  const isImposter = agent.status === "imposter";
+  const statusDisplay =
+    agent.status === "approved"
+      ? "APPROVED"
+      : agent.status === "imposter"
+        ? "IMPOSTER"
+        : "PENDING";
+  const statusColor =
+    agent.status === "double-agent"
+      ? "text-amber-400 border-amber-500/50"
+      : isImposter
+        ? "text-red-500 border-red-500/50"
+        : "text-cyan-400 border-cyan-500/50";
+  const hexGlow =
+    agent.status === "double-agent"
+      ? "shadow-[0_0_8px_rgba(251,191,36,0.35)]"
+      : isImposter
+        ? "shadow-[0_0_8px_rgba(239,68,68,0.35)]"
+        : "shadow-[0_0_8px_rgba(34,211,238,0.35)]";
+  return (
+    <div
+      key={agent.id}
+      className={`min-h-[9rem] min-w-[7rem] p-[1px] ${
+        isImposter
+          ? "bg-red-500/30 fui-imposter-flicker"
+          : agent.status === "double-agent"
+            ? "bg-amber-500/25"
+            : "bg-cyan-500/30"
+      }`}
+      style={{
+        clipPath:
+          "polygon(0% 8px, 8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%)",
+      }}
+    >
+      <div
+        className="fui-bloom bg-slate-950/90 backdrop-blur-md"
+        style={{
+          fontFamily: "var(--font-fui-mono)",
+          clipPath:
+            "polygon(0% 7px, 7px 0%, 100% 0%, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0% 100%)",
+        }}
+      >
+        <div className="flex justify-between items-center border-b border-cyan-900/50 py-0.5 px-1.5">
+          <span className="font-mono text-[6px] tracking-[0.1em] text-cyan-500/70 uppercase break-all">
+            {agent.id.slice(-6)}
+          </span>
+          <div className="flex gap-0.5">
+            {[1, 2].map((j) => (
+              <div
+                key={j}
+                className="h-0.5 w-0.5 rotate-45 bg-cyan-500/50"
+              />
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-1.5 p-1.5">
+          <div className="relative shrink-0">
+            <div
+              className={`h-9 w-9 bg-cyan-500/20 p-[1px] ${hexGlow}`}
+              style={{
+                clipPath:
+                  "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+              }}
+            >
+              {agent.photoDataUrl ? (
+                <img
+                  src={agent.photoDataUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  style={{
+                    clipPath:
+                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                  }}
+                />
+              ) : (
+                <div
+                  className="flex h-full w-full items-center justify-center text-[6px] text-slate-500"
+                  style={{
+                    clipPath:
+                      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                  }}
+                >
+                  —
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-mono text-[6px] text-slate-400 uppercase">
+              Codename
+            </p>
+            <p className="font-mono text-[7px] font-bold uppercase tracking-tight text-cyan-50 break-words">
+              {agent.codename}
+            </p>
+            <p className="mt-0.5 font-mono text-[6px] uppercase text-cyan-500/80">
+              Achievement
+            </p>
+            <p className="font-mono text-[6px] text-cyan-200/90">
+              {agent.achievementTitle ?? "—"}
+            </p>
+            <div
+              className={`mt-1 inline-block rounded border px-1 py-0.5 text-[6px] font-bold bg-black/20 ${statusColor}`}
+            >
+              {statusDisplay} AGENT
+            </div>
+          </div>
+        </div>
+        <div className="relative min-h-[3rem] border-t border-cyan-900/50 py-1 px-1.5 flex flex-col">
+          <div className="flex-1 min-h-0">
+            {agent.story ? (
+              <p className="font-mono text-[6px] leading-tight text-slate-300 whitespace-pre-wrap break-words">
+                <span className="text-cyan-500 mr-0.5 opacity-50">&gt;&gt;</span>{" "}
+                {agent.story}
+              </p>
+            ) : (
+              <p className="font-mono text-[6px] text-slate-500">
+                <span className="text-cyan-500 mr-0.5 opacity-50">&gt;&gt;</span> —
+              </p>
+            )}
+          </div>
+          <div className="absolute bottom-0 right-0 w-3 h-3 opacity-20 border-r border-b border-cyan-400" />
+        </div>
+        <div className="flex justify-between items-center px-1.5 py-1 opacity-30 font-mono text-[5px] text-cyan-500 uppercase border-t-2 border-cyan-500/50 bg-cyan-950/30">
+          <span>SRC: DB.ALPHA</span>
+          <span>GRID_REF</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ScreenPage() {
   const [agents, setAgents] = useState<AgentDoc[]>([]);
   const [loading, setLoading] = useState(true);
@@ -261,8 +393,8 @@ export default function ScreenPage() {
             </Link>
           </header>
 
-          {/* Background: grid of small cards. Center: magnified card overlay that cycles. */}
-          <section className="relative flex-1 overflow-y-auto px-2 pb-28 pt-2 md:px-4">
+          {/* Background: left/right panels so center card doesn't cover any; center overlay cycles. */}
+          <section className="relative flex flex-1 overflow-hidden pb-28 pt-2">
             {loading ? (
               <div className="flex min-h-[40vh] items-center justify-center">
                 <p
@@ -286,146 +418,32 @@ export default function ScreenPage() {
                 </p>
               </div>
             ) : (
-              <>
-                {/* Background grid: small cards for all agents */}
-                <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
-                  {agents.map((agent) => {
-                    const isImposter = agent.status === "imposter";
-                    const statusDisplay =
-                      agent.status === "approved"
-                        ? "APPROVED"
-                        : agent.status === "imposter"
-                          ? "IMPOSTER"
-                          : "PENDING";
-                    const statusColor =
-                      agent.status === "double-agent"
-                        ? "text-amber-400 border-amber-500/50"
-                        : isImposter
-                          ? "text-red-500 border-red-500/50"
-                          : "text-cyan-400 border-cyan-500/50";
-                    const hexGlow =
-                      agent.status === "double-agent"
-                        ? "shadow-[0_0_8px_rgba(251,191,36,0.35)]"
-                        : isImposter
-                          ? "shadow-[0_0_8px_rgba(239,68,68,0.35)]"
-                          : "shadow-[0_0_8px_rgba(34,211,238,0.35)]";
-                    return (
-                      <div
-                        key={agent.id}
-                        className={`p-[1px] ${
-                          isImposter
-                            ? "bg-red-500/30 fui-imposter-flicker"
-                            : agent.status === "double-agent"
-                              ? "bg-amber-500/25"
-                              : "bg-cyan-500/30"
-                        }`}
-                        style={{
-                          clipPath:
-                            "polygon(0% 8px, 8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%)",
-                        }}
-                      >
-                        <div
-                          className="fui-bloom bg-slate-950/90 backdrop-blur-md"
-                          style={{
-                            fontFamily: "var(--font-fui-mono)",
-                            clipPath:
-                              "polygon(0% 7px, 7px 0%, 100% 0%, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0% 100%)",
-                          }}
-                        >
-                          <div className="flex justify-between items-center border-b border-cyan-900/50 py-0.5 px-1.5">
-                            <span className="font-mono text-[6px] tracking-[0.1em] text-cyan-500/70 uppercase truncate max-w-[4rem]">
-                              {agent.id.slice(-6)}
-                            </span>
-                            <div className="flex gap-0.5">
-                              {[1, 2].map((j) => (
-                                <div
-                                  key={j}
-                                  className="h-0.5 w-0.5 rotate-45 bg-cyan-500/50"
-                                />
-                              ))}
-                            </div>
-                          </div>
-                          <div className="flex gap-1.5 p-1.5">
-                            <div className="relative shrink-0">
-                              <div
-                                className={`h-9 w-9 bg-cyan-500/20 p-[1px] ${hexGlow}`}
-                                style={{
-                                  clipPath:
-                                    "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                                }}
-                              >
-                                {agent.photoDataUrl ? (
-                                  <img
-                                    src={agent.photoDataUrl}
-                                    alt=""
-                                    className="h-full w-full object-cover"
-                                    style={{
-                                      clipPath:
-                                        "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                                    }}
-                                  />
-                                ) : (
-                                  <div
-                                    className="flex h-full w-full items-center justify-center text-[6px] text-slate-500"
-                                    style={{
-                                      clipPath:
-                                        "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                                    }}
-                                  >
-                                    —
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="font-mono text-[6px] text-slate-400 uppercase">
-                                Codename
-                              </p>
-                              <p className="font-mono text-[7px] font-bold uppercase tracking-tight text-cyan-50 truncate">
-                                {agent.codename}
-                              </p>
-                              <p className="mt-0.5 font-mono text-[6px] uppercase text-cyan-500/80">
-                                Achievement
-                              </p>
-                              <p className="font-mono text-[6px] text-cyan-200/90 line-clamp-1">
-                                {agent.achievementTitle ?? "—"}
-                              </p>
-                              <div
-                                className={`mt-1 inline-block rounded border px-1 py-0.5 text-[6px] font-bold bg-black/20 ${statusColor}`}
-                              >
-                                {statusDisplay} AGENT
-                              </div>
-                            </div>
-                          </div>
-                          <div className="relative border-t border-cyan-900/50 py-1 px-1.5">
-                            {agent.story ? (
-                              <p className="font-mono text-[6px] leading-tight text-slate-300 line-clamp-2">
-                                <span className="text-cyan-500 mr-0.5 opacity-50">
-                                  &gt;&gt;
-                                </span>
-                                {agent.story}
-                              </p>
-                            ) : (
-                              <p className="font-mono text-[6px] text-slate-500">
-                                <span className="text-cyan-500 mr-0.5 opacity-50">
-                                  &gt;&gt;
-                                </span>
-                                —
-                              </p>
-                            )}
-                            <div className="absolute bottom-0 right-0 w-3 h-3 opacity-20 border-r border-b border-cyan-400" />
-                          </div>
-                          <div className="flex justify-between items-center px-1.5 py-0.5 opacity-30 font-mono text-[5px] text-cyan-500 uppercase border-t border-cyan-900/30">
-                            <span>SRC: DB.ALPHA</span>
-                            <span>GRID_REF</span>
-                          </div>
-                        </div>
+              (() => {
+                const mid = Math.ceil(agents.length / 2);
+                const leftAgents = agents.slice(0, mid);
+                const rightAgents = agents.slice(mid);
+                return (
+                  <>
+                    {/* Left panel: cards never sit under the center overlay */}
+                    <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-1 md:px-2">
+                      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                        {leftAgents.map((agent) => (
+                          <SmallAgentCard key={agent.id} agent={agent} />
+                        ))}
                       </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
+                    </div>
+                    {/* Right panel: same, center stays clear */}
+                    <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-1 md:px-2">
+                      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                        {rightAgents.map((agent) => (
+                          <SmallAgentCard key={agent.id} agent={agent} />
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()
+            ) }
           </section>
 
           {/* Footer: command-prompt style + System Access (QR) module */}
@@ -602,7 +620,7 @@ export default function ScreenPage() {
                       )}
                       <div className="absolute bottom-0 right-0 w-8 h-8 opacity-20 border-r border-b border-cyan-400" />
                     </div>
-                    <div className="flex justify-between items-center px-4 py-1.5 opacity-30 font-mono text-[8px] text-cyan-500 uppercase border-t border-cyan-900/30">
+                    <div className="flex justify-between items-center px-4 py-1 opacity-30 font-mono text-[8px] text-cyan-500 uppercase border-t-2 border-cyan-500/50 bg-cyan-950/30">
                       <span>SRC: DB.ALPHA_V.2.0</span>
                       <span className="flex items-center gap-2">
                         <div className="w-8 h-[1px] bg-cyan-500" />
