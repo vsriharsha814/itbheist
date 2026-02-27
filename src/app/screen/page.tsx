@@ -473,8 +473,8 @@ export default function ScreenPage() {
         style={transformStyle}
       >
         <main className="relative flex min-h-screen flex-col">
-          {/* Background: left/right panels so center card doesn't cover any; center overlay cycles. */}
-          <section className="relative flex flex-1 overflow-hidden pb-28 pt-11">
+          {/* Background: continuous vertical feed behind the center overlay */}
+          <section className="relative flex flex-1 overflow-hidden pb-0 pt-11">
             {loading ? (
               <div className="flex min-h-[40vh] items-center justify-center">
                 <p
@@ -498,32 +498,28 @@ export default function ScreenPage() {
                 </p>
               </div>
             ) : (
-              (() => {
-                const mid = Math.ceil(agents.length / 2);
-                const leftAgents = agents.slice(0, mid);
-                const rightAgents = agents.slice(mid);
-                return (
-                  <>
-                    {/* Left panel: cards never sit under the center overlay */}
-                    <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-1 md:px-2">
-                      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                        {leftAgents.map((agent) => (
-                          <SmallAgentCard key={agent.id} agent={agent} />
-                        ))}
-                      </div>
+              <div className="flex w-full items-stretch justify-center px-2 md:px-4">
+                <div className="roster-viewport w-full h-full">
+                  <div
+                    className="scrolling-wrapper"
+                    style={{
+                      animation: "roster-infinite-scroll 30s linear infinite",
+                    }}
+                  >
+                    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+                      {[0, 1].map((loop) =>
+                        agents.map((agent, index) => (
+                          <SmallAgentCard
+                            key={`${agent.id}-${loop}-${index}`}
+                            agent={agent}
+                          />
+                        ))
+                      )}
                     </div>
-                    {/* Right panel: same, center stays clear */}
-                    <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-1 md:px-2">
-                      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                        {rightAgents.map((agent) => (
-                          <SmallAgentCard key={agent.id} agent={agent} />
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                );
-              })()
-            ) }
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
         </main>
       </div>
