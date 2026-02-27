@@ -190,6 +190,24 @@ export default function ScreenPage() {
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
   const [clock, setClock] = useState("");
   const [coords, setCoords] = useState("0.00 / 0.00");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = useCallback(() => {
+    if (typeof document === "undefined") return;
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const onFullscreenChange = () =>
+      setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -333,6 +351,50 @@ export default function ScreenPage() {
         </div>
       </div>
 
+      {/* Header: fixed to viewport (outside tilt so it doesn’t tilt) */}
+      <header
+        className="fixed left-0 right-0 top-0 z-30 flex shrink-0 items-center justify-between border-b border-cyan-500/25 bg-slate-950/95 px-4 py-2 backdrop-blur-md md:px-6"
+        style={{ fontFamily: "var(--font-fui-mono)" }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="relative h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]">
+            <span className="absolute inset-0 animate-ping rounded-full bg-cyan-400 opacity-40" />
+          </span>
+          <p
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100"
+            style={{ fontFamily: "var(--font-fui-mono)" }}
+          >
+            IN THE BUFF — AGENT ROSTER
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-cyan-400/50 bg-cyan-500/5 text-cyan-400/60 transition hover:border-cyan-400/60 hover:bg-cyan-500/10 hover:text-cyan-400/80"
+            title={isFullscreen ? "Exit full screen" : "Full screen"}
+            aria-label={isFullscreen ? "Exit full screen" : "Full screen"}
+          >
+            {isFullscreen ? (
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+              </svg>
+            ) : (
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+              </svg>
+            )}
+          </button>
+          <Link
+            href="/"
+            className="rounded border border-cyan-400/60 bg-cyan-500/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-100 transition hover:border-cyan-300 hover:bg-cyan-500/20"
+            style={{ fontFamily: "var(--font-fui-mono)" }}
+          >
+            View Program
+          </Link>
+        </div>
+      </header>
+
       {/* 3D tilt container */}
       <div
         className="relative min-h-screen will-change-transform"
@@ -371,30 +433,8 @@ export default function ScreenPage() {
             ))}
           </div>
 
-          {/* Header */}
-          <header className="flex shrink-0 items-center justify-between px-4 py-3 md:px-6">
-            <div className="flex items-center gap-3">
-              <span className="relative h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.8)]">
-                <span className="absolute inset-0 animate-ping rounded-full bg-cyan-400 opacity-40" />
-              </span>
-              <p
-                className="text-sm font-semibold uppercase tracking-[0.25em] text-cyan-100"
-                style={{ fontFamily: "var(--font-fui-mono)" }}
-              >
-                IN THE BUFF — AGENT ROSTER
-              </p>
-            </div>
-            <Link
-              href="/"
-              className="rounded border border-cyan-400/60 bg-cyan-500/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-cyan-100 transition hover:border-cyan-300 hover:bg-cyan-500/20"
-              style={{ fontFamily: "var(--font-fui-mono)" }}
-            >
-              View Program
-            </Link>
-          </header>
-
           {/* Background: left/right panels so center card doesn't cover any; center overlay cycles. */}
-          <section className="relative flex flex-1 overflow-hidden pb-28 pt-2">
+          <section className="relative flex flex-1 overflow-hidden pb-28 pt-11">
             {loading ? (
               <div className="flex min-h-[40vh] items-center justify-center">
                 <p
@@ -445,46 +485,46 @@ export default function ScreenPage() {
               })()
             ) }
           </section>
-
-          {/* Footer: command-prompt style + System Access (QR) module */}
-          <footer
-            className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between gap-6 border-t border-cyan-500/25 bg-slate-950/95 px-4 py-3 backdrop-blur-md md:px-6"
-            style={{ fontFamily: "var(--font-fui-mono)" }}
-          >
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] text-cyan-300/90">
-                <span className="text-emerald-400/90">USER</span>
-                <span className="text-cyan-500">@</span>
-                <span className="text-cyan-400">ROSTER</span>
-                <span className="text-slate-500">:~$</span>
-                <span className="ml-1 text-cyan-200/90">SCAN_TO_REGISTER_</span>
-                <span className="animate-pulse text-cyan-400">▌</span>
-              </p>
-              <p className="mt-0.5 text-[10px] text-slate-400">
-                Input required: scan QR with device camera to open Agent Scanner.
-              </p>
-            </div>
-            {/* System Access module: QR + scanning beam + rotating frame */}
-            <div className="fui-qr-rotate-frame relative flex shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-cyan-400/50 bg-slate-900/95 p-2.5 shadow-[0_0_28px_rgba(6,182,212,0.35)]">
-              <div className="fui-qr-scan-beam" />
-              {qrValue ? (
-                <QRCodeCanvas
-                  value={qrValue}
-                  size={100}
-                  bgColor="#0f172a"
-                  fgColor="#67e8f9"
-                  includeMargin
-                />
-              ) : (
-                <div className="h-[100px] w-[100px] animate-pulse rounded bg-slate-800" />
-              )}
-              <p className="absolute -bottom-1 left-1 right-1 text-center text-[8px] uppercase tracking-widest text-cyan-400/70">
-                SYSTEM_ACCESS
-              </p>
-            </div>
-          </footer>
         </main>
       </div>
+
+      {/* Footer: fixed to viewport (outside tilt so it doesn't tilt) */}
+      <footer
+        className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between gap-6 border-t border-cyan-500/25 bg-slate-950/95 px-4 py-3 backdrop-blur-md md:px-6"
+        style={{ fontFamily: "var(--font-fui-mono)" }}
+      >
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] text-cyan-300/90">
+            <span className="text-emerald-400/90">USER</span>
+            <span className="text-cyan-500">@</span>
+            <span className="text-cyan-400">ROSTER</span>
+            <span className="text-slate-500">:~$</span>
+            <span className="ml-1 text-cyan-200/90">SCAN_TO_REGISTER_</span>
+            <span className="animate-pulse text-cyan-400">▌</span>
+          </p>
+          <p className="mt-0.5 text-[10px] text-slate-400">
+            Input required: scan QR with device camera to open Agent Scanner.
+          </p>
+        </div>
+        {/* System Access module: QR + scanning beam + rotating frame */}
+        <div className="fui-qr-rotate-frame relative flex shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-cyan-400/50 bg-slate-900/95 p-2.5 shadow-[0_0_28px_rgba(6,182,212,0.35)]">
+          <div className="fui-qr-scan-beam" />
+          {qrValue ? (
+            <QRCodeCanvas
+              value={qrValue}
+              size={100}
+              bgColor="#0f172a"
+              fgColor="#67e8f9"
+              includeMargin
+            />
+          ) : (
+            <div className="h-[100px] w-[100px] animate-pulse rounded bg-slate-800" />
+          )}
+          <p className="absolute -bottom-1 left-1 right-1 text-center text-[8px] uppercase tracking-widest text-cyan-400/70">
+            SYSTEM_ACCESS
+          </p>
+        </div>
+      </footer>
 
       {/* Center card: outside tilt container so fixed is viewport-relative; left/top 50% + translate for true center */}
       {!loading && !error && agents.length > 0 && (
