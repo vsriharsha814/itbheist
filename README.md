@@ -67,24 +67,6 @@ This is the venue-facing display, designed to be run full screen on a projector.
   - Stepped footer with waveform, shell–style prompt, and QR code for check–in.
   - Hex–grid, scanlines, and subtle parallax to keep the screen feeling “alive”.
 
-### `/screen/download` — Hidden photo export
-
-- A **hidden utility route** (not linked from the UI) used to export agent photos.
-- Reads the same `agents` data and lists every document that has a `photoDataUrl`.
-- For each agent it shows:
-  - Optimized thumbnail.
-  - Codename.
-  - Agent alias (or `CLASSIFIED`).
-- Provides a **Download** button that triggers a client–side download using a safe filename:
-
-```txt
-{codename}_{last6OfId}_{index}.png
-```
-
-You can hit this URL directly (e.g. `https://…/screen/download`) when you need to pull assets.
-
----
-
 ## Architecture overview
 
 ### Tech stack
@@ -97,9 +79,7 @@ You can hit this URL directly (e.g. `https://…/screen/download`) when you need
 ### Data model
 
 - Single primary collection: **`agents`**.
-- Documents are written by `/agent` and consumed by:
-  - `/screen` (live roster + focus card).
-  - `/screen/download` (photo export).
+- Documents are written by `/agent` and consumed by `/screen` for the live roster + focus card.
 - The roster derives additional, purely visual state on the client:
   - `focusedIndex` for the center card.
   - `mouseTilt`, clock, and fake coordinates for ambience.
@@ -132,7 +112,6 @@ Then open:
 - `http://localhost:3000/` for the briefing.
 - `http://localhost:3000/agent` on a phone / scanner station.
 - `http://localhost:3000/screen` on the big display.
-- `http://localhost:3000/screen/download` when you need to export photos.
 
 For deployment details and required Firebase env vars, see `DEPLOYMENT.md`.
 
