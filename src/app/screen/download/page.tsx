@@ -20,6 +20,7 @@ type AgentDoc = {
   photoDataUrl?: string;
   story?: string;
   achievementTitle?: string;
+  agentAlias?: string;
 };
 
 function mapDoc(doc: DocumentData): AgentDoc {
@@ -31,6 +32,7 @@ function mapDoc(doc: DocumentData): AgentDoc {
     photoDataUrl: data.photoDataUrl,
     story: data.story,
     achievementTitle: data.achievementTitle,
+    agentAlias: data.agentAlias,
   };
 }
 
@@ -130,6 +132,11 @@ export default function ScreenDownloadPage() {
                   <div className="p-2">
                     <p className="font-mono text-xs text-cyan-300 truncate">
                       {agent.codename}
+                    </p>
+                    <p className="font-mono text-[10px] text-slate-500 truncate">
+                      {agent.agentAlias && agent.agentAlias !== "CLASSIFIED"
+                        ? agent.agentAlias
+                        : "CLASSIFIED"}
                     </p>
                     <button
                       type="button"

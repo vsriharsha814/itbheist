@@ -21,6 +21,7 @@ type AgentDoc = {
   photoDataUrl?: string;
   story?: string;
   achievementTitle?: string;
+  agentAlias?: string;
 };
 
 function statusLabel(status: AgentStatus) {
@@ -43,6 +44,7 @@ function mapDoc(doc: DocumentData): AgentDoc {
     photoDataUrl: data.photoDataUrl,
     story: data.story,
     achievementTitle: data.achievementTitle,
+    agentAlias: data.agentAlias,
   };
 }
 
@@ -138,6 +140,14 @@ function SmallAgentCard({ agent }: { agent: AgentDoc }) {
             </p>
             <p className="font-mono text-[7px] font-bold uppercase tracking-tight text-cyan-50 break-words">
               {agent.codename}
+            </p>
+            <p className="font-mono text-[6px] text-slate-500 uppercase mt-0.5">
+              Agent alias
+            </p>
+            <p className="font-mono text-[6px] text-cyan-400/90 break-words">
+              {agent.agentAlias && agent.agentAlias !== "CLASSIFIED"
+                ? agent.agentAlias
+                : "CLASSIFIED"}
             </p>
             <p className="mt-0.5 font-mono text-[6px] uppercase text-cyan-500/80">
               Achievement
@@ -660,6 +670,14 @@ export default function ScreenPage() {
                             <h2 className="text-xl font-bold uppercase tracking-tighter text-cyan-50 leading-tight md:text-2xl">
                               {agent.codename}
                             </h2>
+                            <p className="font-mono text-[9px] text-slate-500 uppercase mt-0.5">
+                              Agent alias
+                            </p>
+                            <p className="font-mono text-sm text-cyan-400/90">
+                              {agent.agentAlias && agent.agentAlias !== "CLASSIFIED"
+                                ? agent.agentAlias
+                                : "CLASSIFIED"}
+                            </p>
                           </div>
                           <div className="hidden sm:flex flex-col items-end gap-0.5">
                             <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400">

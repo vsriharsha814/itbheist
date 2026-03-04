@@ -121,6 +121,7 @@ export default function AgentPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [agentAlias, setAgentAlias] = useState("");
   const [codename, setCodename] = useState<string | null>(null);
   const [status, setStatus] = useState<AgentStatus | null>(null);
   const [usedCodeNames, setUsedCodeNames] = useState<string[]>([]);
@@ -192,12 +193,16 @@ export default function AgentPage() {
 
         const optimizedPhoto = await optimizeImageToPassport(file);
 
+        const aliasToSave =
+          agentAlias.trim().length > 0 ? agentAlias.trim() : "CLASSIFIED";
+
         await addDoc(collection(db, "agents"), {
           codename: newCodename,
           status: newStatus,
           photoDataUrl: optimizedPhoto,
           story: template.story,
           achievementTitle: template.achievement_title,
+          agentAlias: aliasToSave,
           createdAt: serverTimestamp(),
         });
 
@@ -218,7 +223,7 @@ export default function AgentPage() {
         setLoading(false);
       }
     },
-    [file, usedCodeNames]
+    [file, usedCodeNames, agentAlias]
   );
 
   return (
@@ -292,6 +297,22 @@ export default function AgentPage() {
                 onChange={handleFileChange}
               />
             </label>
+
+            <label
+              htmlFor="agent-alias"
+              className="block text-[11px] uppercase tracking-[0.2em] text-slate-400"
+            >
+              Your name or agent alias (optional)
+            </label>
+            <input
+              id="agent-alias"
+              type="text"
+              value={agentAlias}
+              onChange={(e) => setAgentAlias(e.target.value)}
+              placeholder="Leave blank for CLASSIFIED"
+              maxLength={64}
+              className="w-full rounded-xl border border-slate-600 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-emerald-500/60 focus:outline-none"
+            />
 
             <button
               type="submit"
