@@ -108,11 +108,11 @@ function statusLabel(status: AgentStatus) {
 function statusColorClasses(status: AgentStatus) {
   switch (status) {
     case "approved":
-      return "border-emerald-400 text-emerald-200 bg-emerald-500/10";
+      return "border-red-800/70 text-red-300/90 bg-red-950/50";
     case "double-agent":
       return "border-yellow-400 text-yellow-200 bg-yellow-500/10";
     case "imposter":
-      return "border-rose-400 text-rose-200 bg-rose-500/10";
+      return "border-red-800/70 text-red-300/90 bg-red-950/50";
   }
 }
 
@@ -229,12 +229,12 @@ export default function AgentPage() {
   return (
     <div className="scanlines min-h-screen bg-black text-slate-100">
       <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-6 px-4 pb-10 pt-6 md:max-w-2xl md:gap-8 md:px-6 lg:max-w-3xl lg:px-8">
-        <header className="flex items-center justify-between rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 backdrop-blur">
+        <header className="flex items-center justify-between rounded-2xl border border-red-900/55 bg-red-950/45 px-4 py-3 backdrop-blur">
           <div className="space-y-0.5">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-emerald-300/80">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-red-400/70">
               In The Buff
             </p>
-            <p className="text-sm font-semibold text-emerald-100 md:text-base">
+            <p className="text-sm font-semibold text-red-200/95 md:text-base">
               Agent Clearance Scanner
             </p>
           </div>
@@ -244,15 +244,15 @@ export default function AgentPage() {
             </p>
             <Link
               href="/"
-              className="text-[11px] font-medium text-emerald-200 underline-offset-4 hover:underline"
+              className="text-[11px] font-medium text-red-300/85 underline-offset-4 hover:underline"
             >
               Back to briefing
             </Link>
           </div>
         </header>
 
-        <section className="hud-card rounded-3xl border border-emerald-500/25 bg-slate-900/60 px-4 py-5 backdrop-blur md:px-6">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-emerald-300/80">
+        <section className="hud-card rounded-3xl border border-red-950/50 bg-slate-900/60 px-4 py-5 backdrop-blur md:px-6">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-red-400/70">
             Step 1 — Upload
           </p>
           <h1 className="mt-2 text-2xl font-semibold leading-snug text-slate-50 md:text-3xl">
@@ -266,13 +266,13 @@ export default function AgentPage() {
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <label
               htmlFor="photo"
-              className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-600 bg-slate-950/60 px-4 py-6 text-center text-xs text-slate-300 transition hover:border-emerald-400/70 hover:bg-slate-900/70"
+              className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-600 bg-slate-950/60 px-4 py-6 text-center text-xs text-slate-300 transition hover:border-red-900/55 hover:bg-slate-900/70"
             >
               {previewUrl ? (
                 <img
                   src={previewUrl}
                   alt="Preview"
-                  className="h-32 w-32 rounded-xl border border-emerald-500/40 object-cover shadow-[0_0_20px_rgba(16,185,129,0.6)]"
+                  className="h-32 w-32 rounded-xl border border-red-900/50 object-cover shadow-[0_0_18px_rgba(69,10,10,0.45)]"
                 />
               ) : (
                 <span className="flex h-16 w-16 items-center justify-center rounded-full border border-slate-600 text-2xl text-slate-500">
@@ -311,19 +311,19 @@ export default function AgentPage() {
               onChange={(e) => setAgentAlias(e.target.value)}
               placeholder="Leave blank for CLASSIFIED"
               maxLength={64}
-              className="w-full rounded-xl border border-slate-600 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-emerald-500/60 focus:outline-none"
+              className="w-full rounded-xl border border-slate-600 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-red-800/55 focus:outline-none"
             />
 
             <button
               type="submit"
               disabled={disabled}
-              className="inline-flex w-full items-center justify-center rounded-2xl border border-emerald-500/70 bg-emerald-500/20 px-4 py-2.5 text-sm font-semibold text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.6)] transition hover:border-emerald-300 hover:bg-emerald-500/30 disabled:cursor-not-allowed disabled:border-slate-700 disabled:bg-slate-800/60"
+              className="inline-flex w-full items-center justify-center rounded-2xl border border-red-800/55 bg-red-950/50 px-4 py-2.5 text-sm font-semibold text-red-100 shadow-[0_0_16px_rgba(69,10,10,0.5)] transition hover:border-red-700/55 hover:bg-red-950/65 disabled:cursor-not-allowed disabled:border-slate-700 disabled:bg-slate-800/60"
             >
               {loading ? "Scanning..." : "Scan for clearance"}
             </button>
 
             {error && (
-              <p className="text-xs text-rose-300">
+              <p className="text-xs text-red-400/85">
                 {error}
               </p>
             )}
@@ -357,7 +357,7 @@ export default function AgentPage() {
                 <p className="text-[10px] uppercase tracking-[0.26em] text-slate-400">
                   Assigned Codename
                 </p>
-                <p className="text-lg font-semibold text-emerald-200 md:text-xl">
+                <p className="text-lg font-semibold text-red-300/95 md:text-xl">
                   {codename}
                 </p>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">

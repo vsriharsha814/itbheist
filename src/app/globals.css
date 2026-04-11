@@ -60,7 +60,7 @@ body {
 }
 
 .hud-card {
-  box-shadow: 0 0 40px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 36px rgba(69, 10, 10, 0.45);
 }
 
 /* Screen: floating agent cards */

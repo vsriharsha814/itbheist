@@ -64,18 +64,18 @@ export default function Home() {
   return (
     <div className="scanlines min-h-screen bg-black text-slate-100">
       <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-6 px-4 pb-10 pt-6 md:max-w-2xl md:gap-8 md:px-6 lg:max-w-4xl lg:gap-10 lg:px-8">
-        <header className="flex items-center justify-between rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 backdrop-blur md:px-5 md:py-4">
+        <header className="flex items-center justify-between rounded-2xl border border-red-900/55 bg-red-950/45 px-4 py-3 backdrop-blur md:px-5 md:py-4">
           <div className="space-y-0.5">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-emerald-300/80">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-red-400/70">
               In The Buff
             </p>
-            <p className="text-sm font-semibold text-emerald-100 md:text-base">
+            <p className="text-sm font-semibold text-red-200/95 md:text-base">
               Operation: Classified Briefing
             </p>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <div className="flex items-center gap-2 text-xs text-emerald-200/80">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.9)] pulse-dot" />
+            <div className="flex items-center gap-2 text-xs text-red-300/75">
+              <span className="h-2 w-2 rounded-full bg-red-800 shadow-[0_0_14px_rgba(127,29,29,0.55)] pulse-dot" />
               <span>System Online</span>
             </div>
             <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">
@@ -84,12 +84,12 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="hud-card rounded-3xl border border-emerald-500/25 bg-slate-900/60 px-4 py-5 backdrop-blur md:px-6 md:py-6">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-emerald-300/80">
+        <section className="hud-card rounded-3xl border border-red-950/50 bg-slate-900/60 px-4 py-5 backdrop-blur md:px-6 md:py-6">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-red-400/70">
             Mission Briefing
           </p>
           <h1 className="mt-2 text-2xl font-semibold leading-snug text-slate-50 md:text-3xl">
-            <span className="text-emerald-300">Your cover:</span> concert
+            <span className="text-red-400/90">Your cover:</span> concert
             guest, trusted operative.
           </h1>
           <p className="mt-3 text-sm text-slate-300 md:text-base">
@@ -115,13 +115,13 @@ export default function Home() {
           <button
             type="button"
             onClick={scrollToOrder}
-            className="mt-5 inline-flex w-full items-center justify-between rounded-2xl border border-emerald-500/50 bg-emerald-500/20 px-3 py-2 text-xs font-medium text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.6)] transition hover:border-emerald-300 hover:bg-emerald-500/30 active:scale-[0.99]"
+            className="mt-5 inline-flex w-full items-center justify-between rounded-2xl border border-red-800/50 bg-red-950/50 px-3 py-2 text-xs font-medium text-red-100 shadow-[0_0_16px_rgba(69,10,10,0.5)] transition hover:border-red-700/55 hover:bg-red-950/65 active:scale-[0.99]"
           >
             <span className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+              <span className="h-1.5 w-1.5 rounded-full bg-red-700" />
               View operation order
             </span>
-            <span className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/80">
+            <span className="text-[10px] uppercase tracking-[0.28em] text-red-200/80">
               Access
             </span>
           </button>
@@ -132,7 +132,7 @@ export default function Home() {
             <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-300">
               Operation Order
             </h2>
-            <span className="rounded-full border border-emerald-500/40 px-2 py-0.5 text-[10px] text-emerald-200">
+            <span className="rounded-full border border-red-900/50 px-2 py-0.5 text-[10px] text-red-300/85">
               {SETLIST.length} events
             </span>
           </div>
@@ -152,17 +152,17 @@ export default function Home() {
                   onClick={() =>
                     setExpandedSetId(isExpanded ? null : item.id)
                   }
-                  className="group relative flex w-full items-stretch gap-3 rounded-2xl border border-emerald-500/25 bg-slate-950/60 px-3.5 py-3 text-left transition hover:border-emerald-400/70 hover:bg-slate-900/80 active:scale-[0.99]"
+                  className="group relative flex w-full items-stretch gap-3 rounded-2xl border border-red-950/40 bg-slate-950/60 px-3.5 py-3 text-left transition hover:border-red-900/55 hover:bg-slate-900/80 active:scale-[0.99]"
                 >
                   <div className="flex flex-col items-center pt-0.5">
-                    <span className="text-[10px] font-semibold text-emerald-300/90">
+                    <span className="text-[10px] font-semibold text-red-400/80">
                       #{String(index + 1).padStart(2, "0")}
                     </span>
-                    <span className="mt-1 h-10 w-px bg-gradient-to-b from-emerald-400/70 via-emerald-500/10 to-transparent" />
+                    <span className="mt-1 h-10 w-px bg-gradient-to-b from-red-800/55 via-red-950/25 to-transparent" />
                   </div>
                   <div className="flex-1 space-y-1.5">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-200">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-red-300/90">
                         {item.codeName}
                       </p>
                       {item.approxTime ? (
@@ -185,7 +185,7 @@ export default function Home() {
                     )}
                   </div>
                   <div className="flex flex-col items-end justify-between">
-                    <span className="rounded-full border border-emerald-500/40 px-1.5 py-0.5 text-[10px] text-emerald-200/90 group-hover:border-emerald-300 group-hover:text-emerald-100">
+                    <span className="rounded-full border border-red-900/50 px-1.5 py-0.5 text-[10px] text-red-300/85 group-hover:border-red-800/60 group-hover:text-red-200">
                       {isExpanded ? "Hide" : "Intel"}
                     </span>
                     <span className="text-[10px] text-slate-500">
@@ -215,19 +215,19 @@ export default function Home() {
                   key={mission.id}
                   type="button"
                   onClick={() => toggleMission(mission.id)}
-                  className="flex w-full items-start gap-3 rounded-2xl border border-slate-700/80 bg-slate-950/70 px-3.5 py-3 text-left text-xs text-slate-200 transition hover:border-emerald-400/60 hover:bg-slate-900/80 active:scale-[0.99]"
+                  className="flex w-full items-start gap-3 rounded-2xl border border-slate-700/80 bg-slate-950/70 px-3.5 py-3 text-left text-xs text-slate-200 transition hover:border-red-900/45 hover:bg-slate-900/80 active:scale-[0.99]"
                 >
                   <div
                     className={`mt-0.5 flex h-4 w-4 items-center justify-center rounded-sm border text-[10px] ${
                       done
-                        ? "border-emerald-400 bg-emerald-500/80 text-slate-950 shadow-[0_0_14px_rgba(16,185,129,0.9)]"
+                        ? "border-red-800 bg-red-950/90 text-red-100 shadow-[0_0_12px_rgba(127,29,29,0.45)]"
                         : "border-slate-600 bg-slate-950/80 text-slate-500"
                     }`}
                   >
                     {done ? "✓" : ""}
                   </div>
                   <div className="space-y-1">
-                    <p className="font-semibold text-emerald-100">
+                    <p className="font-semibold text-red-200/95">
                       {mission.title}
                     </p>
                     <p className="text-[11px] text-slate-300">
@@ -248,7 +248,7 @@ export default function Home() {
             <p className="font-semibold uppercase tracking-[0.24em] text-slate-400">
               Field Notes
             </p>
-            <span className="rounded-full border border-emerald-500/40 px-2 py-0.5 text-[10px] text-emerald-200/90">
+            <span className="rounded-full border border-red-900/50 px-2 py-0.5 text-[10px] text-red-300/80">
               Eyes only
             </span>
           </div>
@@ -270,7 +270,7 @@ export default function Home() {
           </div>
           <Link
             href="/agent"
-            className="rounded-full border border-emerald-400 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200 transition hover:border-emerald-200 hover:bg-emerald-500/10"
+            className="rounded-full border border-red-800/55 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-red-300/90 transition hover:border-red-700/50 hover:bg-red-950/40"
           >
             Agent Check-In
           </Link>
