@@ -1,0 +1,179 @@
+{
+  "_readme": "Operation Order for the home page (/). Edit operationOrder[] only. Fields: id (number), codeName (main label), title (subtitle line), note (text shown when user taps Intel). approxTime is optional — omit it or set null to hide the time slot.",
+  "operationOrder": [
+    {
+      "id": 1,
+      "codeName": "Act 1",
+      "title": "Uniforms — more ballads, more \"serious\" sound",
+      "note": "Opening act tone: ballads and a more serious sound."
+    },
+    {
+      "id": 2,
+      "codeName": "Video Skit",
+      "title": "Cold open on screen",
+      "note": "Video skit before the live set kicks in."
+    },
+    {
+      "id": 3,
+      "codeName": "Let's Get It Started",
+      "title": "Jackson takes Z solo; Zoolander on Wu Tang's",
+      "note": "Let's Get It Started — Jackson takes Z solo; Zoolander on Wu Tang's."
+    },
+    {
+      "id": 4,
+      "codeName": "MC Introduction",
+      "title": "Host takes the floor",
+      "note": "MC introduction."
+    },
+    {
+      "id": 5,
+      "codeName": "Sleeper Agent",
+      "title": "Featured performance",
+      "note": "Sleeper Agent."
+    },
+    {
+      "id": 6,
+      "codeName": "Still Feel",
+      "title": "Featured performance",
+      "note": "Still Feel."
+    },
+    {
+      "id": 7,
+      "codeName": "No Time",
+      "title": "No Time to Die — Boss briefing",
+      "note": "Being an agent is a dangerous mission. You have to accept the fact you very well might not make it back alive. The Boss would like to remind you that being dead is unacceptable to our high standards and will result in immediate termination of your position. Our missions are too consequential, there's simply No Time to Die."
+    },
+    {
+      "id": 8,
+      "codeName": "Doves",
+      "title": "DD solo",
+      "note": "Doves — DD solo."
+    },
+    {
+      "id": 9,
+      "codeName": "Come Back To Earth",
+      "title": "Featured performance",
+      "note": "Come Back To Earth."
+    },
+    {
+      "id": 10,
+      "codeName": "Secret Meetup",
+      "title": "Featured performance",
+      "note": "Secret Meetup."
+    },
+    {
+      "id": 11,
+      "codeName": "Feed The Machine",
+      "title": "Squire solo",
+      "note": "To get into the mind of an anti-bureaucrat, which the Boss prioritizes as his enemy number one, you must think like one. You must have controversial ideas, such as the government IS NOT spending our money the correct way, and American history has… flaws? Singing one of the anarchists' songs can help adopt this challenging mindset."
+    },
+    {
+      "id": 12,
+      "codeName": "Runaway",
+      "title": "Featured performance",
+      "note": "Runaway."
+    },
+    {
+      "id": 13,
+      "codeName": "Gemini",
+      "title": "Astrology intel — Boss hiring policy",
+      "note": "The Boss takes astrology very seriously. He refuses to hire Sagittarius because they can't keep a secret, Aries are too impulsive, and Pisces are too emotional. There is a star sign, however, that the Boss attempts to hire whenever possible due to their perfect combination of wit and charm: Gemini."
+    },
+    {
+      "id": 14,
+      "codeName": "DANCE SKIT",
+      "title": "Choreographed break",
+      "note": "Dance skit."
+    },
+    {
+      "id": 15,
+      "codeName": "Intermission",
+      "title": "Break",
+      "note": "Intermission — stretch, hydrate, debrief."
+    },
+    {
+      "id": 16,
+      "codeName": "Act 2",
+      "title": "Costumes — more silly and thematic",
+      "note": "Second act: sillier, more thematic energy."
+    },
+    {
+      "id": 17,
+      "codeName": "Ring Ring Ring",
+      "title": "Burner phone protocol",
+      "note": "Smartphones are not allowed on a heist. Each field operative must carry multiple burner phones on their body at all times. Communication goes two ways: if an active agent or base support is called, you are permitted three rings – ring ring ring – before you must – and this is important – pick up the phone, girl."
+    },
+    {
+      "id": 18,
+      "codeName": "All Star",
+      "title": "Character study training",
+      "note": "All operatives must undergo intensive training on the study of character. Before going out into the field, expect to do deep psychoanalysis reports on the characters of classic films, such as Citizen Kane, Taxi Driver, and the Shrek franchise."
+    },
+    {
+      "id": 19,
+      "codeName": "Z's mystery Presentation",
+      "title": "Classified slides",
+      "note": "Z's mystery presentation."
+    },
+    {
+      "id": 20,
+      "codeName": "Believer",
+      "title": "Featured performance",
+      "note": "Believer."
+    },
+    {
+      "id": 21,
+      "codeName": "No Handz",
+      "title": "Just first verse",
+      "note": "No Handz — first verse only."
+    },
+    {
+      "id": 22,
+      "codeName": "Cali Gurlz",
+      "title": "Featured performance",
+      "note": "Cali Gurlz."
+    },
+    {
+      "id": 23,
+      "codeName": "Hacker Skit",
+      "title": "On-stage bit",
+      "note": "Hacker skit."
+    },
+    {
+      "id": 24,
+      "codeName": "Bring Alumni Up",
+      "title": "Alumni moment",
+      "note": "Bring alumni up."
+    },
+    {
+      "id": 25,
+      "codeName": "Kiss From A Rose",
+      "title": "Alumni song",
+      "note": "Alumni song — print a bunch of sheet music for this."
+    },
+    {
+      "id": 26,
+      "codeName": "Socro",
+      "title": "Featured performance",
+      "note": "Socro."
+    },
+    {
+      "id": 27,
+      "codeName": "May The Road",
+      "title": "Featured performance",
+      "note": "May The Road."
+    },
+    {
+      "id": 28,
+      "codeName": "EXIT",
+      "title": "Show close",
+      "note": "EXIT — mission ends."
+    },
+    {
+      "id": 29,
+      "codeName": "Encore: Somebody To Love",
+      "title": "Drip solo",
+      "note": "Encore: Somebody To Love — Drip solo. If not sounding ready, Runaway."
+    }
+  ]
+}

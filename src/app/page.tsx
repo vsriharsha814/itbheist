@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
+import operationOrderData from "@/data/operation-order.json";
 
 type SetItem = {
   id: number;
@@ -17,50 +18,7 @@ type Mission = {
   description: string;
 };
 
-const SETLIST: SetItem[] = [
-  {
-    id: 1,
-    codeName: "Cold Open",
-    title: "First contact with the audience",
-    approxTime: "≈ 6:00 PM",
-    note: "Stay sharp — this is your first impression op.",
-  },
-  {
-    id: 2,
-    codeName: "Operation Throwback",
-    title: "Classic In The Buff charts",
-    approxTime: "≈ 6:10 PM",
-    note: "Identify any alumni agents singing along.",
-  },
-  {
-    id: 3,
-    codeName: "Deep Cover Solos",
-    title: "Feature solos from undercover agents",
-    approxTime: "≈ 6:25 PM",
-    note: "Your mission: do not blow their cover by screaming their real names.",
-  },
-  {
-    id: 4,
-    codeName: "Intermission Debrief",
-    title: "Short break for snacks and intel gathering",
-    approxTime: "≈ 6:40 PM",
-    note: "Hydrate. Stretch. Strategize your favorite moment so far.",
-  },
-  {
-    id: 5,
-    codeName: "Phase Two",
-    title: "New arrangements and secret weapons",
-    approxTime: "≈ 6:55 PM",
-    note: "Listen for code phrases hidden in the lyrics.",
-  },
-  {
-    id: 6,
-    codeName: "Final Transmission",
-    title: "Encore & classified goodbyes",
-    approxTime: "≈ 7:20 PM",
-    note: "Mission complete. Extract safely, humming the last chord.",
-  },
-];
+const SETLIST: SetItem[] = operationOrderData.operationOrder;
 
 const MISSIONS: Mission[] = [
   {
